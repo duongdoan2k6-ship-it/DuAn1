@@ -24,9 +24,5 @@ $action = $_GET['action'] ?? '/';
 // Sử dụng match để gọi Controller tương ứng
 match ($action) {
     '/'     => (new HomeController)->index(),
-    
-    // Dòng này (dòng 27) giờ sẽ chạy được
-    'list-tours' => (new TourController)->index(), 
-    
-    // ...
+    'list-tours' => (new TourController)->index(),
 };
