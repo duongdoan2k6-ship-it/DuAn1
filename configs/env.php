@@ -1,5 +1,5 @@
 <?php
-
+//                          mỗi máy là 1 đường dẫn khác nhau nên phải sửa đường dẫn
 define('BASE_URL',          'http://localhost/DA01-PRO1014.01/');
 
 // Đường dẫn tới các thư mục quan trọng
@@ -11,7 +11,7 @@ define('PATH_MODEL',        ROOT_PATH . DIRECTORY_SEPARATOR . 'models' . DIRECTO
 define('BASE_ASSETS_UPLOADS',   BASE_URL . 'public/uploads/'); 
 define('PATH_ASSETS_UPLOADS',   ROOT_PATH . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'uploads' . DIRECTORY_SEPARATOR); 
 
-// Cấu hình Database
+// Cấu hình Database (cả db này nữa)
 define('DB_HOST',     'localhost');
 define('DB_PORT',     '3306');
 define('DB_USERNAME', 'root');
