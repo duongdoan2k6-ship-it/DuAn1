@@ -9,6 +9,8 @@ require_once $projectRoot . '/controllers/HomeController.php';
 require_once $projectRoot . '/controllers/TourController.php';
 require_once $projectRoot . '/controllers/PersonController.php';
 
+
+
 // --- NẠP MODELS ---
 // (Nếu bạn có file BaseModel.php, hãy nạp nó trước)
 // require_once $projectRoot . '/models/BaseModel.php'; 
@@ -26,6 +28,7 @@ $action = $_GET['action'] ?? '/';
 match ($action) {
     '/'     => (new HomeController) -> index(),
     'list-tours' => (new TourController) -> index(),
+    'add-tour' => (new TourController) -> add(),
     'person' => (new PersonController) -> index(),
     'delete' => (new PersonController) -> delete(),
     'formAddPerson' => (new PersonController) -> formAddPerson(),

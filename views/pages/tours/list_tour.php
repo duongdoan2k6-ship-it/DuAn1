@@ -1,4 +1,4 @@
-<!-- Trọng Dương -->
+
  
 <div class="row">
     <div class="col-12">
@@ -6,6 +6,9 @@
             <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
                 <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
                     <h6 class="text-white text-capitalize ps-3"><?php echo $pageTitle; ?></h6>
+                    <a href="index.php?action=add-tour" class="btn bg-gradient-dark me-3 mb-0">
+                        <i class="material-icons text-sm"></i>&nbsp;&nbsp;Thêm Tour
+                    </a>
                 </div>
             </div>
             <div class="card-body px-0 pb-2">
