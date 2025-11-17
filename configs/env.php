@@ -1,5 +1,4 @@
 <?php
-//                          mỗi máy là 1 đường dẫn khác nhau nên phải sửa đường dẫn
 define('BASE_URL',          'http://localhost/DA01-PRO1014.01/');
 
 // Đường dẫn tới các thư mục quan trọng

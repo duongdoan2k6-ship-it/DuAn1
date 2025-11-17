@@ -34,12 +34,17 @@
             <ul class="navbar-nav">
                 <li class="nav-item">
                     <a class="nav-link text-white active bg-gradient-primary" href="<?php echo base_url('public/'); ?>">
-                        <span class="nav-link-text ms-1">Test</span>
+                        <span class="nav-link-text ms-1">Trang chủ</span>
                     </a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link text-white active bg-gradient-primary" href="<?php echo base_url('public/index.php?action=list-tours'); ?>">
-                        <span class="nav-link-text ms-1">Danh sách Tour</span>
+                        <span class="nav-link-text ms-1">Danh sách chuyến du lịch</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white active bg-gradient-primary" href="<?php echo base_url('public/index.php?action=person'); ?>">
+                        <span class="nav-link-text ms-1">Danh sách nhân sự</span>
                     </a>
                 </li>
             </ul>
