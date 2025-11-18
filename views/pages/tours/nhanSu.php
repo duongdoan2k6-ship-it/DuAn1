@@ -5,7 +5,7 @@
         <div class="card my-4">
             <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
                 <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
-                    <h6 class="text-white text-capitalize ps-3">Danh sách nhân Sự </6>
+                    <h6 class="text-white text-capitalize ps-3">Danh sách nhân Sự </6><br>
                         <a href="index.php?action=formAddPerson" class="btn bg-gradient-dark me-3 mb-0">
                             <i class="material-icons text-sm"></i>&nbsp;&nbsp;Thêm Nhân Viên
                         </a>
@@ -40,8 +40,8 @@
                                     <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2"><?= $item['KinhNghiem'] ?></th>
                                     <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2"><?= $item['TinhTrangSucKhoe'] ?></th>
                                     <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
-                                        <a class="btn btn-danger btn-sm" href="index.php?controller=person&action=delete&id=<?= $item['MaHDV'] ?>">Xoá</a>
                                         <a class="btn btn-warning btn-sm" href="index.php?controller=person&action=edit&id=<?= $item['MaHDV'] ?>">Sửa</a>
+                                        <a class="btn btn-danger btn-sm" href="index.php?controller=person&action=delete&id=<?= $item['MaHDV'] ?>">Xoá</a>
                                     </th>
                                     <th class="text-secondary opacity-7"></th>
                                 </tr>

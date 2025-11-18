@@ -40,12 +40,11 @@
                                     <td>
                                         <span class="text-secondary text-xs font-weight-bold"><?php echo htmlspecialchars($tour['ThoiLuong']); ?></span>
                                     </td>
-                                    <td class="align-middle">
-                                        <a href="#" class="text-secondary font-weight-bold text-xs">
+                                    <td class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+                                        <a href="#" class="btn btn-warning btn-sm">
                                             Sửa
                                         </a>
-                                        |
-                                        <a href="#" class="text-danger font-weight-bold text-xs">
+                                        <a href="#" class="btn btn-danger btn-sm">
                                             Xóa
                                         </a>
                                     </td>
