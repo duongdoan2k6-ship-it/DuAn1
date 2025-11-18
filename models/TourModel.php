@@ -2,26 +2,28 @@
 // models/TourModel.php
 
 class TourModel extends BaseModel {
-    /**
-     * Lấy tất cả tour (cùng với Tên Loại Tour)
-     */
+
     public function getAllTours() {
         $sql = "SELECT 
-                    t.MaTour, 
-                    t.TenTour, 
-                    t.ThoiLuong, 
-                    t.DiaDiemKhoiHanh, 
-                    lt.TenLoai      
-                FROM 
-                    tourdulich t
-                LEFT JOIN 
-                    loaitour lt ON t.MaLoaiTour = lt.MaLoaiTour
-                ORDER BY 
-                    t.MaTour DESC";
+        t.MaTour, 
+        t.TenTour, 
+        t.ThoiLuong, 
+        t.DiaDiemKhoiHanh, 
+        t.GiaTour,
+        t.MoTa,
+        lt.TenLoai,
+        t.MaLoaiTour
+    FROM 
+        tourdulich t
+    LEFT JOIN 
+        loaitour lt ON t.MaLoaiTour = lt.MaLoaiTour
+    ORDER BY 
+        t.MaTour DESC";
 
-        $stmt = $this->conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+
+    $stmt = $this->conn->prepare($sql);
+    $stmt->execute();
+    return $stmt->fetchAll();
     }
     // Ví dụ về việc gọi hàm được kế thừa:
     public function getAllLoaiTour() {
@@ -32,27 +34,74 @@ class TourModel extends BaseModel {
         return $stmt->fetchAll();
     }
 
-    // --- HÀM INSERT PHẢI NẰM TRONG CLASS (TRƯỚC DẤU ĐÓNG NGOẶC) ---
-    public function insert($ten, $maLoai, $thoiLuong, $diaDiem, $moTa) {
+   
+    public function insert($ten, $maLoai, $thoiLuong,$giaTour, $diaDiem, $moTa) {
         try {
-            $sql = "INSERT INTO tourdulich (TenTour, MaLoaiTour, ThoiLuong, DiaDiemKhoiHanh, MoTa) 
-                    VALUES (:ten, :maLoai, :thoiLuong, :diaDiem, :moTa)";
+            $sql = "INSERT INTO tourdulich (TenTour, MaLoaiTour, ThoiLuong, GiaTour , DiaDiemKhoiHanh, MoTa) 
+                    VALUES (:ten, :maLoai, :thoiLuong,:giaTour, :diaDiem, :moTa)";
             
             $stmt = $this->conn->prepare($sql);
             
-            // Gán giá trị vào các tham số
+            
             $stmt->bindParam(':ten', $ten);
             $stmt->bindParam(':maLoai', $maLoai);
             $stmt->bindParam(':thoiLuong', $thoiLuong);
+            $stmt->bindParam(':giaTour', $giaTour);
             $stmt->bindParam(':diaDiem', $diaDiem);
             $stmt->bindParam(':moTa', $moTa);
             
-            return $stmt->execute(); // Trả về true nếu thành công
+            return $stmt->execute(); 
         } catch (PDOException $e) {
             echo "Lỗi SQL: " . $e->getMessage();
             return false;
         }
     }
+
+
+    public function updateTour($maTour, $ten, $maLoai, $thoiLuong, $giaTour, $diaDiem, $moTa) {
+    try {
+        $sql = "UPDATE tourdulich 
+                SET TenTour = :ten, 
+                    MaLoaiTour = :maLoai, 
+                    ThoiLuong = :thoiLuong, 
+                    GiaTour = :giaTour, 
+                    DiaDiemKhoiHanh = :diaDiem, 
+                    MoTa = :moTa
+                WHERE MaTour = :maTour";
+
+        $stmt = $this->conn->prepare($sql);
+
+        $stmt->bindParam(':ten', $ten);
+        $stmt->bindParam(':maLoai', $maLoai);
+        $stmt->bindParam(':thoiLuong', $thoiLuong);
+        $stmt->bindParam(':giaTour', $giaTour);
+        $stmt->bindParam(':diaDiem', $diaDiem);
+        $stmt->bindParam(':moTa', $moTa);
+        $stmt->bindParam(':maTour', $maTour);
+
+        return $stmt->execute();
+    } catch (PDOException $e) {
+        echo "Lỗi SQL: " . $e->getMessage();
+        return false;
+    }
+}
+
+
+
+
+
+    public function delete($maTour) {
+    try {
+        $sql = "DELETE FROM tourdulich WHERE MaTour = :maTour";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bindParam(':maTour', $maTour);
+        return $stmt->execute();
+    } catch (PDOException $e) {
+        echo "Lỗi SQL: " . $e->getMessage();
+        return false;
+    }
+}
+
 
 } 
 ?>

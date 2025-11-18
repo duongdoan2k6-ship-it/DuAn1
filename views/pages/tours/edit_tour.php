@@ -9,22 +9,24 @@
 
             <div class="card-body px-4 pb-2">
 
-                <form action="index.php?action=add-tour" method="POST">
+                <form action="index.php?action=edit-tour&id=<?= $tour['MaTour'] ?>" method="POST">
 
                     <div class="input-group input-group-outline my-3">
-                        <label class="form-label">Tên Tour</label>
-                        <input type="text" name="ten_tour" class="form-control" required>
+                        <label class="form-label"></label>
+                        <input type="text" name="ten_tour" class="form-control"
+                            value="<?= htmlspecialchars($tour['TenTour']) ?>" required>
                     </div>
 
                     <div class="row">
                         <div class="col-md-6">
-                            <div class="input-group input-group-outline my-3 is-filled">
-                                <label class="form-label">Loại Tour</label>
+                            <div class="input-group input-group-outline my-3">
+                                <label class="form-label"></label>
                                 <select name="ma_loai_tour" class="form-control" required>
                                     <option value="">-- Chọn loại tour --</option>
                                     <?php if (!empty($dsLoaiTour)): ?>
                                         <?php foreach ($dsLoaiTour as $loai): ?>
-                                            <option value="<?= $loai['MaLoaiTour'] ?>">
+                                            <option value="<?= $loai['MaLoaiTour'] ?>"
+                                                <?= $tour['MaLoaiTour'] == $loai['MaLoaiTour'] ? 'selected' : '' ?>>
                                                 <?= htmlspecialchars($loai['TenLoai']) ?>
                                             </option>
                                         <?php endforeach; ?>
@@ -35,26 +37,29 @@
 
                         <div class="col-md-6">
                             <div class="input-group input-group-outline my-3">
-                                <label class="form-label">Thời lượng</label>
-                                <input type="text" name="thoi_luong" class="form-control" required>
+                                <label class="form-label"></label>
+                                <input type="text" name="thoi_luong" class="form-control"
+                                    value="<?= htmlspecialchars($tour['ThoiLuong']) ?>" required>
                             </div>
                         </div>
                     </div>
 
                     <div class="input-group input-group-outline my-3">
-                        <label class="form-label">Giá Tour (VNĐ)</label>
-                        <input type="number" name="gia_tour" class="form-control" required min="0">
-                    </div>
-
-
-                    <div class="input-group input-group-outline my-3">
-                        <label class="form-label">Địa điểm khởi hành</label>
-                        <input type="text" name="dia_diem" class="form-control">
+                        <label class="form-label"></label>
+                        <input type="number" name="gia_tour" class="form-control"
+                            value="<?= htmlspecialchars($tour['GiaTour']) ?>" required min="0">
                     </div>
 
                     <div class="input-group input-group-outline my-3">
-                        <textarea name="mo_ta" class="form-control" rows="5" placeholder="Mô tả chi tiết lịch trình..."></textarea>
+                        <label class="form-label"></label>
+                        <input type="text" name="dia_diem" class="form-control"
+                            value="<?= htmlspecialchars($tour['DiaDiemKhoiHanh']) ?>">
                     </div>
+
+                    <div class="input-group input-group-outline my-3">
+                        <textarea name="mo_ta" class="form-control" rows="5" placeholder="Mô tả chi tiết lịch trình..."><?= htmlspecialchars($tour['MoTa']) ?></textarea>
+                    </div>
+
                     <div class="d-flex justify-content-end mt-4 mb-3">
                         <a href="index.php?action=list-tours" class="btn btn-outline-secondary me-2">Hủy bỏ</a>
                         <button type="submit" class="btn bg-gradient-primary">Lưu Tour</button>

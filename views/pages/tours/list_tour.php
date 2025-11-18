@@ -1,29 +1,33 @@
-
- 
 <div class="row">
     <div class="col-12">
         <div class="card my-4">
             <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
-                <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
-                    <h6 class="text-white text-capitalize ps-3"><?php echo $pageTitle; ?></h6>
+
+
+                <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3 d-flex justify-content-between align-items-center">
+                    <h6 class="text-white text-capitalize ps-3 mb-0"><?php echo $pageTitle; ?></h6>
+
                     <a href="index.php?action=add-tour" class="btn bg-gradient-dark me-3 mb-0">
                         <i class="material-icons text-sm"></i>&nbsp;&nbsp;Thêm Tour
                     </a>
                 </div>
+
+
             </div>
             <div class="card-body px-0 pb-2">
                 <div class="table-responsive p-0">
                     <table class="table align-items-center mb-0">
                         <thead>
                             <tr>
-                                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Tên Tour & Nơi khởi hành</th>
-                                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Loại Tour</th>
-                                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Thời Lượng</th>
+                                <th class="text-uppercase text-secondary text-xxs font-weight-bolder ">Tên Tour & Nơi khởi hành</th>
+                                <th class="text-uppercase text-secondary text-xxs font-weight-bolder  ps-2">Loại Tour</th>
+                                <th class="text-uppercase text-secondary text-xxs font-weight-bolder  ps-2">Thời Lượng</th>
+                                <th class="text-uppercase text-secondary text-xxs font-weight-bolder  ps-2">Giá Tour</th>
                                 <th class="text-secondary opacity-7"></th>
                             </tr>
                         </thead>
                         <tbody>
-                            
+
                             <?php foreach ($tours as $tour): ?>
                                 <tr>
                                     <td>
@@ -40,17 +44,25 @@
                                     <td>
                                         <span class="text-secondary text-xs font-weight-bold"><?php echo htmlspecialchars($tour['ThoiLuong']); ?></span>
                                     </td>
-                                    <td class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
-                                        <a href="#" class="btn btn-warning btn-sm">
-                                            Sửa
-                                        </a>
-                                        <a href="#" class="btn btn-danger btn-sm">
+                                    <td>
+                                        <span class="text-secondary text-xs font-weight-bold">
+                                            <?= number_format($tour['GiaTour'], 0, ',', '.') ?> VNĐ
+</span>
+                                    </td>
+
+                                    <td class="align-middle">
+                                        <a href="index.php?action=edit-tour&id=<?= $tour['MaTour'] ?>" class="btn btn-sm btn-warning">Sửa</a>
+                                        
+                                        <a href="index.php?action=delete-tour&id=<?= $tour['MaTour'] ?>"
+                                            class="btn btn-danger btn-sm"
+                                            onclick="return confirm('Bạn có chắc muốn xóa tour này?');">
                                             Xóa
                                         </a>
+
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
-                            
+
                         </tbody>
                     </table>
                 </div>
