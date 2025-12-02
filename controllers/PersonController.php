@@ -17,7 +17,7 @@ class PersonController extends BaseController
             'pageTitle' => 'Danh sách nhân sự'
         ];
 
-        $this->renderView('pages/tours/nhanSu.php', $data);
+        $this->renderView('pages/person/nhanSu.php', $data);
     }
 
     public function delete()
@@ -32,21 +32,124 @@ class PersonController extends BaseController
 
     public function formAddPerson()
     {
-        $this->renderView('pages/tours/addPerson.php');
+        $this->renderView('pages/person/addPerson.php');
     }
 
     public function addPerson()
     {
-        $name = $_POST['HoTen'];
-        $date = $_POST['NgaySinh'];
-        $img = $_FILES['AnhDaiDien'];
-        $sdt = $_POST['ThongTinLienHe'];
-        $languages = $_POST['NgonNgu'];
-        $exp = $_POST['KinhNghiem'];
-        $health = $_POST['TinhTrangSucKhoe'];
+        $hoTen = $_POST['HoTen'];
+        $ngaySinh = $_POST['NgaySinh'];
+        $gioiTinh = $_POST['GioiTinh'];
+        $sdt = $_POST['SDT'];
+        $email = $_POST['Email'];
+        $diaChi = $_POST['DiaChi'];
+        $cccd = $_POST['CCCD'];
+        $maThe = $_POST['MaThe'];
+        $loaiHDV = $_POST['LoaiHDV'];
+        $trangThai = $_POST['TrangThai'];
+        $ngonNgu = $_POST['NgonNgu'];
+        $kinhNghiem = $_POST['KinhNghiem'];
+        $sucKhoe = $_POST['TinhTrangSucKhoe'];
 
-        $this->modelPerson->addPerson($name, $date, $img, $sdt, $languages, $exp, $health);
+        $soTour = 0;
+        $danhGia = 0;
+
+        $anhDaiDien = '';
+        if (isset($_FILES['AnhDaiDien']) && $_FILES['AnhDaiDien']['error'] == 0) {
+            $anhDaiDien = time() . '_' . $_FILES['AnhDaiDien']['name'];
+            move_uploaded_file($_FILES['AnhDaiDien']['tmp_name'], "uploads/" . $anhDaiDien);
+        }
+
+        $this->modelPerson->addPerson(
+            $hoTen,
+            $gioiTinh,
+            $ngaySinh,
+            $anhDaiDien,
+            $sdt,
+            $email,
+            $diaChi,
+            $cccd,
+            $maThe,
+            $loaiHDV,
+            $trangThai,
+            $ngonNgu,
+            $kinhNghiem,
+            $sucKhoe,
+            $soTour,
+            $danhGia
+        );
+
         header("Location: index.php?controller=person&action=person");
         exit();
+    }
+
+
+    public function editPerson()
+    {
+        if (isset($_GET['id'])) {
+            $MaHDV = $_GET['id'];
+            $person = $this->modelPerson->getPersonById($MaHDV);
+
+            if (!$person) {
+                header("Location: index.php?controller=person&action=person");
+                exit();
+            }
+
+            $this->renderView('pages/person/editPerson.php', [
+                'person' => $person
+            ]);
+        }
+    }
+
+    public function updatePerson()
+    {
+        if (isset($_GET['id'])) {
+            $id = $_GET['id'];
+
+            $hoTen      = $_POST['HoTen'];
+            $ngaySinh   = $_POST['NgaySinh'];
+            $gioiTinh   = $_POST['GioiTinh'];
+            $cccd       = $_POST['CCCD'];
+            $sdt        = $_POST['SDT'];
+            $email      = $_POST['Email'];
+$diaChi     = $_POST['DiaChi'];
+            $maThe      = $_POST['MaThe'];
+            $loaiHDV    = $_POST['LoaiHDV'];
+            $trangThai  = $_POST['TrangThai'];
+            $ngonNgu    = $_POST['NgonNgu'];
+            $kinhNghiem = $_POST['KinhNghiem'];
+            $sucKhoe    = $_POST['TinhTrangSucKhoe'];
+
+            $anhDaiDien = '';
+
+            if (isset($_FILES['AnhDaiDien']) && $_FILES['AnhDaiDien']['error'] == 0 && !empty($_FILES['AnhDaiDien']['name'])) {
+                $anhDaiDien = time() . '_' . $_FILES['AnhDaiDien']['name'];
+                move_uploaded_file($_FILES['AnhDaiDien']['tmp_name'], "uploads/" . $anhDaiDien);
+            } else {
+
+                $anhDaiDien = $_POST['AnhCu'];
+            }
+
+            $this->modelPerson->updatePerson(
+                $id,
+                $hoTen,
+                $gioiTinh,
+                $ngaySinh,
+                $anhDaiDien,
+                $sdt,
+                $email,
+                $diaChi,
+                $cccd,
+                $maThe,
+                $loaiHDV,
+                $trangThai,
+                $ngonNgu,
+                $kinhNghiem,
+                $sucKhoe
+            );
+
+            header("Location: index.php?controller=person&action=person");
+            exit();
+        }
     }
 }

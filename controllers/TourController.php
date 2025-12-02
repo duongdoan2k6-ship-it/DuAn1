@@ -20,34 +20,46 @@ class TourController extends BaseController {
     }
 
     public function add() {
-        $tourModel = new TourModel();
-        $dsLoaiTour = $tourModel->getAllLoaiTour();
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $tenTour = $_POST['ten_tour'];
-            $maLoaiTour = $_POST['ma_loai_tour'];
-            $thoiLuong = $_POST['thoi_luong'];
-            $giaTour = $_POST['gia_tour'];
-            $diaDiem = $_POST['dia_diem'];
-            $moTa = $_POST['mo_ta'];
+    $tourModel = new TourModel();
+    $dsLoaiTour = $tourModel->getAllLoaiTour();
 
-            $isInserted = $tourModel->insert($tenTour, $maLoaiTour, $thoiLuong,$giaTour, $diaDiem, $moTa);
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-            if ($isInserted) {
-                
-                header('Location: index.php?action=list-tours');
-                exit();
-            } else {
-                
-                echo "Lỗi khi thêm tour mới.";
-            }
+        $tenTour     = $_POST['ten_tour'];
+        $maLoaiTour  = $_POST['ma_loai_tour'];
+        $thoiLuong   = $_POST['thoi_luong'];
+        $giaTour     = $_POST['gia_tour'];
+        $diaDiem     = $_POST['dia_diem'];
+        $moTa        = $_POST['mo_ta'];
+
+        // Gọi đúng thứ tự tham số theo Model: 
+        // insert($ten, $maLoai, $thoiLuong, $giaTour, $diaDiem, $moTa, $trangThai = 1)
+        $isInserted = $tourModel->insert(
+            $tenTour,
+            $maLoaiTour,
+            $thoiLuong,
+            $giaTour,
+            $diaDiem,
+            $moTa,
+            1 // trạng thái mặc định: đang hoạt động
+        );
+
+        if ($isInserted) {
+            header('Location: index.php?action=list-tours');
+            exit();
+        } else {
+            echo "Lỗi khi thêm tour mới.";
         }
+    }
 
-        $data = [
-            'dsLoaiTour' => $dsLoaiTour,
-            'pageTitle' => 'Thêm Tour Mới'
-        ];
-        $this->renderView('pages/tours/add_tour.php', $data);
-    }   
+    $data = [
+        'dsLoaiTour' => $dsLoaiTour,
+        'pageTitle'  => 'Thêm Tour Mới'
+    ];
+
+    $this->renderView('pages/tours/add_tour.php', $data);
+}
+
 
 
     

@@ -11,16 +11,22 @@
 
                 <form action="index.php?action=edit-tour&id=<?= $tour['MaTour'] ?>" method="POST">
 
-                    <div class="input-group input-group-outline my-3">
-                        <label class="form-label"></label>
-                        <input type="text" name="ten_tour" class="form-control"
-                            value="<?= htmlspecialchars($tour['TenTour']) ?>" required>
-                    </div>
+
+
 
                     <div class="row">
                         <div class="col-md-6">
-                            <div class="input-group input-group-outline my-3">
-                                <label class="form-label"></label>
+
+                            <div class="input-group input-group-outline my-3 is-filled">
+                                <label class="form-label">Tên tour</label>
+                                <input type="text" name="ten_tour" class="form-control"
+                                    value="<?= htmlspecialchars($tour['TenTour']) ?>" required>
+                            </div>
+
+
+
+                            <div class="input-group input-group-outline my-3 is-filled">
+                                <label class="form-label">Loại tour</label>
                                 <select name="ma_loai_tour" class="form-control" required>
                                     <option value="">-- Chọn loại tour --</option>
                                     <?php if (!empty($dsLoaiTour)): ?>
@@ -35,32 +41,35 @@
                             </div>
                         </div>
 
-                        <div class="col-md-6">
-                            <div class="input-group input-group-outline my-3">
-                                <label class="form-label"></label>
-                                <input type="text" name="thoi_luong" class="form-control"
-                                    value="<?= htmlspecialchars($tour['ThoiLuong']) ?>" required>
-                            </div>
-                        </div>
+
                     </div>
 
-                    <div class="input-group input-group-outline my-3">
-                        <label class="form-label"></label>
+                    <div class="input-group input-group-outline my-3  is-filled">
+                        <label class="form-label">Trạng thái</label>
+                        <select name="trang_thai" class="form-control" required>
+                            <option value="1" <?= $tour['TrangThai'] == 1 ? 'selected' : '' ?>> Hoạt động</option>
+                            <option value="0" <?= $tour['TrangThai'] == 0 ? 'selected' : '' ?>> Tạm dừng</option>
+                        </select>
+                    </div>
+
+
+                    <div class="input-group input-group-outline my-3 is-filled">
+                        <label class="form-label">Giá</label>
                         <input type="number" name="gia_tour" class="form-control"
                             value="<?= htmlspecialchars($tour['GiaTour']) ?>" required min="0">
                     </div>
 
-                    <div class="input-group input-group-outline my-3">
-                        <label class="form-label"></label>
+                    <div class="input-group input-group-outline my-3  is-filled">
+                        <label class="form-label">Địa điểm khởi hành</label>
                         <input type="text" name="dia_diem" class="form-control"
                             value="<?= htmlspecialchars($tour['DiaDiemKhoiHanh']) ?>">
                     </div>
 
-                    <div class="input-group input-group-outline my-3">
+                    <div class="input-group input-group-outline my-3 is-filled">
                         <textarea name="mo_ta" class="form-control" rows="5" placeholder="Mô tả chi tiết lịch trình..."><?= htmlspecialchars($tour['MoTa']) ?></textarea>
                     </div>
 
-                    <div class="d-flex justify-content-end mt-4 mb-3">
+                    <div class="d-flex justify-content-end mt-4 mb-3  is-filled">
                         <a href="index.php?action=list-tours" class="btn btn-outline-secondary me-2">Hủy bỏ</a>
                         <button type="submit" class="btn bg-gradient-primary">Lưu Tour</button>
                     </div>

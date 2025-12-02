@@ -33,12 +33,12 @@
                             </div>
                         </div>
 
-                        <div class="col-md-6">
+                        
                             <div class="input-group input-group-outline my-3">
                                 <label class="form-label">Thời lượng</label>
                                 <input type="text" name="thoi_luong" class="form-control" required>
                             </div>
-                        </div>
+                        
                     </div>
 
                     <div class="input-group input-group-outline my-3">
@@ -47,18 +47,30 @@
                     </div>
 
 
-                    <div class="input-group input-group-outline my-3">
-                        <label class="form-label">Địa điểm khởi hành</label>
-                        <input type="text" name="dia_diem" class="form-control">
-                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="input-group input-group-outline my-3 is-filled">
+                                <label class="form-label">Trang thái</label>
+                                <select name="ma_loai_tour" class="form-control" required>
+                                    <option value="1">Hoạt động</option>
+                                    <option value="0">Tạm dừng</option>
+                                </select>
+                            </div>
+                        </div>
 
-                    <div class="input-group input-group-outline my-3">
-                        <textarea name="mo_ta" class="form-control" rows="5" placeholder="Mô tả chi tiết lịch trình..."></textarea>
-                    </div>
-                    <div class="d-flex justify-content-end mt-4 mb-3">
-                        <a href="index.php?action=list-tours" class="btn btn-outline-secondary me-2">Hủy bỏ</a>
-                        <button type="submit" class="btn bg-gradient-primary">Lưu Tour</button>
-                    </div>
+
+                        <div class="input-group input-group-outline my-3">
+                            <label class="form-label">Địa điểm khởi hành</label>
+                            <input type="text" name="dia_diem" class="form-control">
+                        </div>
+
+                        <div class="input-group input-group-outline my-3">
+                            <textarea name="mo_ta" class="form-control" rows="5" placeholder="Mô tả chi tiết lịch trình..."></textarea>
+                        </div>
+                        <div class="d-flex justify-content-end mt-4 mb-3">
+                            <a href="index.php?action=list-tours" class="btn btn-outline-secondary me-2">Hủy bỏ</a>
+                            <button type="submit" class="btn bg-gradient-primary">Lưu Tour</button>
+                        </div>
 
                 </form>
             </div>

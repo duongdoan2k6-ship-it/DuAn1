@@ -39,7 +39,7 @@
                 </li>
                 <li class="nav-item">
                     <a class="nav-link text-white active bg-gradient-primary" href="<?php echo base_url('public/index.php?action=list-tours'); ?>">
-                        <span class="nav-link-text ms-1">Danh sách chuyến du lịch</span>
+                        <span class="nav-link-text ms-1">Quản lý tour </span>
                     </a>
                 </li>
                 <li class="nav-item">
@@ -47,6 +47,22 @@
                         <span class="nav-link-text ms-1">Danh sách nhân sự</span>
                     </a>
                 </li>
+
+                <li class="nav-item">
+                    <a class="nav-link text-white active bg-gradient-primary" href="<?php echo base_url('public/index.php?action=list-baocao'); ?>">
+                        <span class="nav-link-text ms-1">Báo cáo tài chính</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link text-white active bg-gradient-primary"
+                        href="<?php echo base_url('public/index.php?action=list-booking'); ?>">
+                        <span class="nav-link-text ms-1">
+                            Quản lý Booking
+                        </span>
+                    </a>
+                </li>
+
             </ul>
         </div>
     </aside>
@@ -73,7 +89,6 @@
     <script src="<?php echo asset_url('js/core/bootstrap.min.js'); ?>"></script>
     <script src="<?php echo asset_url('js/plugins/perfect-scrollbar.min.js'); ?>"></script>
     <script src="<?php echo asset_url('js/plugins/smooth-scrollbar.min.js'); ?>"></script>
-
     <script src="<?php echo asset_url('js/material-dashboard.min.js?v=3.0.0'); ?>"></script>
 </body>
 
