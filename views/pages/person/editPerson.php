@@ -6,14 +6,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sửa thông tin nhân sự</title>
     <style>
-        .form-control, .form-select {
+        .form-control,
+        .form-select {
             border: 1px solid #d2d6da !important;
             padding: 0.5rem 0.75rem;
             border-radius: 0.375rem;
             background-color: #fff;
         }
 
-        .form-control:focus, .form-select:focus {
+        .form-control:focus,
+        .form-select:focus {
             border-color: #e91e63 !important;
             box-shadow: 0 0 0 2px rgba(233, 30, 99, 0.25);
         }
@@ -28,7 +30,7 @@
             border-bottom: 1px solid #eee;
             padding-bottom: 5px;
         }
-        
+
         .avatar-preview {
             width: 100px;
             height: 100px;
@@ -50,7 +52,7 @@
                 </div>
                 <div class="card-body px-4 py-4">
                     <form action="index.php?controller=person&action=updatePerson&id=<?= $person['MaHDV'] ?>" method="POST" enctype="multipart/form-data">
-                        
+
                         <h6 class="section-title">1. Thông tin cá nhân</h6>
                         <div class="row g-4">
                             <div class="col-md-4">
@@ -65,7 +67,7 @@
                                 <label class="form-label fw-bold">Giới tính</label>
                                 <select class="form-select" name="GioiTinh">
                                     <option value="Nam" <?= $person['GioiTinh'] == 'Nam' ? 'selected' : '' ?>>Nam</option>
-<input type="text" class="form-control" name="MaThe" value="<?= $person['MaThe'] ?>" required>
+                                    <input type="text" class="form-control" name="MaThe" value="<?= $person['MaThe'] ?>" required>
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label fw-bold">Loại thẻ HDV</label>
@@ -96,62 +98,63 @@
                                 <textarea class="form-control" name="KinhNghiem" rows="3"><?= $person['KinhNghiem'] ?></textarea>
                             </div>
                         </div>
-                        
+
                         <input type="hidden" name="Sotour" value="<?= $person['Sotour'] ?>">
                         <input type="hidden" name="DanhGia" value="<?= $person['DanhGia'] ?>">
 
                         <div class="text-end mt-4">
                             <a href="index.php?controller=person" class="btn btn-light m-0">Hủy bỏ</a>
-<option value="Nữ" <?= $person['GioiTinh'] == 'Nữ' ? 'selected' : '' ?>>Nữ</option>
-                                    <option value="Khác" <?= $person['GioiTinh'] == 'Khác' ? 'selected' : '' ?>>Khác</option>
-                                </select>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label fw-bold">CCCD/CMND</label>
-                                <input type="text" class="form-control" name="CCCD" value="<?= $person['CCCD'] ?>" required>
-                            </div>
-                            
-                            <div class="col-md-8">
-                                <label class="form-label fw-bold">Ảnh đại diện</label>
-                                <div class="d-flex align-items-center">
-                                    <div class="me-3">
-                                        <img src="uploads/<?= $person['AnhDaiDien'] ?>" class="avatar-preview" alt="Current Image">
-                                    </div>
-                                    <div class="flex-grow-1">
-                                        <input type="file" class="form-control" name="AnhDaiDien">
-                                        <small class="text-muted">Chỉ chọn ảnh nếu muốn thay đổi ảnh hiện tại.</small>
-                                        <input type="hidden" name="AnhCu" value="<?= $person['AnhDaiDien'] ?>">
-                                    </div>
+                            <option value="Nữ" <?= $person['GioiTinh'] == 'Nữ' ? 'selected' : '' ?>>Nữ</option>
+                            <option value="Khác" <?= $person['GioiTinh'] == 'Khác' ? 'selected' : '' ?>>Khác</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">CCCD/CMND</label>
+                            <input type="text" class="form-control" name="CCCD" value="<?= $person['CCCD'] ?>" required>
+                        </div>
+
+                        <div class="col-md-8">
+                            <label class="form-label fw-bold">Ảnh đại diện</label>
+                            <div class="d-flex align-items-center">
+                                <div class="me-3">
+                                    <img src="uploads/<?= $person['AnhDaiDien'] ?>" class="avatar-preview" alt="Current Image">
+                                </div>
+                                <div class="flex-grow-1">
+                                    <input type="file" class="form-control" name="AnhDaiDien">
+                                    <small class="text-muted">Chỉ chọn ảnh nếu muốn thay đổi ảnh hiện tại.</small>
+                                    <input type="hidden" name="AnhCu" value="<?= $person['AnhDaiDien'] ?>">
                                 </div>
                             </div>
                         </div>
+                </div>
 
-                        <h6 class="section-title">2. Thông tin liên hệ</h6>
-                        <div class="row g-4">
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold">Số điện thoại</label>
-                                <input type="text" class="form-control" name="SDT" value="<?= $person['SDT'] ?>" required> 
-                                </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold">Email</label>
-                                <input type="email" class="form-control" name="Email" value="<?= $person['Email'] ?>" required>
-                            </div>
-                            <div class="col-md-12">
-                                <label class="form-label fw-bold">Địa chỉ thường trú</label>
-                                <input type="text" class="form-control" name="DiaChi" value="<?= $person['DiaChi'] ?>" required>
-                            </div>
-                        </div>
+                <h6 class="section-title">2. Thông tin liên hệ</h6>
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Số điện thoại</label>
+                        <input type="text" class="form-control" name="SDT" value="<?= $person['SDT'] ?>" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Email</label>
+                        <input type="email" class="form-control" name="Email" value="<?= $person['Email'] ?>" required>
+                    </div>
+                    <div class="col-md-12">
+                        <label class="form-label fw-bold">Địa chỉ thường trú</label>
+                        <input type="text" class="form-control" name="DiaChi" value="<?= $person['DiaChi'] ?>" required>
+                    </div>
+                </div>
 
-                        <h6 class="section-title">3. Thông tin nghề nghiệp & Thẻ</h6>
-                        <div class="row g-4">
-                            <div class="col-md-4">
-                                <label class="form-label fw-bold">Mã thẻ HDV</label>
-<button type="submit" class="btn bg-gradient-info m-0 ms-2">Cập nhật thông tin</button>
-                        </div>
+                <h6 class="section-title">3. Thông tin nghề nghiệp & Thẻ</h6>
+                <div class="row g-4">
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold">Mã thẻ HDV</label>
+                        <button type="submit" class="btn bg-gradient-info m-0 ms-2">Cập nhật thông tin</button>
+                    </div>
                     </form>
                 </div>
             </div>
         </div>
     </div>
 </body>
+
 </html>

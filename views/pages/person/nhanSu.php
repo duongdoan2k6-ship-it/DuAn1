@@ -99,13 +99,23 @@
                                         <span class="text-secondary text-xs font-weight-bold"><?= $item['DanhGia'] ?> / 5</span>
                                     </td>
                                     <td class="align-middle">
-                                    <a href="index.php?action=edit-tour&id=<?= $tour['MaTour'] ?>" class="btn btn-sm btn-warning">Sửa</a>
-                                    <a href="index.php?action=delete-tour&id=<?= $tour['MaTour'] ?>"
-                                        class="btn btn-danger btn-sm"
-                                        onclick="return confirm('Bạn có chắc muốn xóa tour này?');">
-                                        Xóa
-                                    </a>
-                                </td>
+
+
+                                        <a href="index.php?controller=person&action=editPerson&id=<?= $item['MaHDV'] ?>" class="btn btn-sm btn-warning">Sửa</a>
+
+
+                                        <a href="index.php?controller=person&action=delete&id=<?= $item['MaHDV'] ?>"
+                                            class="btn btn-danger btn-sm"
+                                            onclick="return confirm('Bạn có chắc muốn xóa ?');">
+                                            Xóa
+                                        </a>
+
+
+
+
+                                    </td>
+
+
                                 </tr>
                             <?php } ?>
                         </tbody>
@@ -115,3 +125,4 @@
         </div>
     </div>
 </div>
+

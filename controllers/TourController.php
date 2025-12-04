@@ -92,10 +92,22 @@ class TourController extends BaseController {
         $maLoaiTour = $_POST['ma_loai_tour'];
         $thoiLuong = $_POST['thoi_luong'];
         $giaTour = $_POST['gia_tour'];
+        $trangThai = $_POST['trang_thai'];
         $diaDiem = $_POST['dia_diem'];
         $moTa = $_POST['mo_ta'];
 
-        $isUpdated = $tourModel->updateTour($maTour, $tenTour, $maLoaiTour, $thoiLuong, $giaTour, $diaDiem, $moTa);
+       $isUpdated = $tourModel->updateTour(
+    $maTour,
+    $tenTour,
+    $maLoaiTour,
+    $thoiLuong,
+    $giaTour,
+    $diaDiem,  // ✔ đúng vị trí
+    $moTa,     // ✔ đúng vị trí
+    $trangThai // ✔ truyền cuối cùng
+);
+
+
 
         if ($isUpdated) {
             header('Location: index.php?action=list-tours');
@@ -133,5 +145,24 @@ $isDeleted = $tourModel->delete($maTour);
         echo "Lỗi: Không thể xoá tour.";
     }
 }
+
+public function detail() {
+    if (!isset($_GET['id'])) die("Thiếu ID tour");
+
+    $maTour = $_GET['id'];
+    $tourModel = new TourModel();
+
+    $tourDetail = $tourModel->getTourDetail($maTour);
+
+    if (!$tourDetail) die("Không tìm thấy tour");
+
+    $data = [
+        'pageTitle' => 'Chi tiết Tour',
+        'tour' => $tourDetail,
+    ];
+
+    $this->renderView('pages/tours/detail_tour.php', $data);
+}
+
 
 }

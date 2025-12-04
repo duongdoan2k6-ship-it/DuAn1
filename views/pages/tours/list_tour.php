@@ -61,7 +61,11 @@
                                         <?php echo $text; ?>
                                     </span>
                                 </td>
+
+
                                 <td class="align-middle">
+                                    <a href="index.php?action=detail-tour&id=<?= $tour['MaTour'] ?>" 
+                                        class="btn btn-info btn-sm">Chi tiết</a>
                                     <a href="index.php?action=edit-tour&id=<?= $tour['MaTour'] ?>" class="btn btn-sm btn-warning">Sửa</a>
                                     <a href="index.php?action=delete-tour&id=<?= $tour['MaTour'] ?>"
                                         class="btn btn-danger btn-sm"
@@ -69,6 +73,7 @@
                                         Xóa
                                     </a>
                                 </td>
+
                             </tr>
                         <?php endforeach; ?>
                     </tbody>

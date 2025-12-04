@@ -59,6 +59,13 @@
                             value="<?= htmlspecialchars($tour['GiaTour']) ?>" required min="0">
                     </div>
 
+                    <div class="input-group input-group-outline my-3 is-filled">
+                        <label class="form-label">Thời lượng</label>
+                        <input type="text" name="thoi_luong" class="form-control"
+                            value="<?= htmlspecialchars($tour['ThoiLuong'] ?? '') ?>" required>
+                    </div>
+
+
                     <div class="input-group input-group-outline my-3  is-filled">
                         <label class="form-label">Địa điểm khởi hành</label>
                         <input type="text" name="dia_diem" class="form-control"

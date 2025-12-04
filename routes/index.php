@@ -1,4 +1,5 @@
 <?php
+// routers.index.php
 $projectRoot = dirname(__DIR__);
 
 require_once $projectRoot . '/controllers/BaseController.php';
@@ -19,16 +20,21 @@ $action = $_GET['action'] ?? '/';
 
 match ($action) {
     '/'     => (new TourController)->index(),
-    'list-tours' => (new TourController)->index(),
-    'add-tour' => (new TourController)->add(),
-    'edit-tour' => (new TourController)->edit(),
-    'delete-tour' => (new TourController)->delete(),
 
-    // personal
-    'person' => (new PersonController)->index(),
-    'delete' => (new PersonController)->delete(),
-    'formAddPerson' => (new PersonController)->formAddPerson(),
-    'addPerson' => (new PersonController)->addPerson(),
+    // Tour
+    'list-tours'     => (new TourController)->index(),
+    'add-tour'       => (new TourController)->add(),
+    'edit-tour'      => (new TourController)->edit(),
+    'delete-tour'    => (new TourController)->delete(),
+    'detail-tour'    => (new TourController)->detail(),
+
+    // Person
+    'person'         => (new PersonController)->index(),
+    'delete-person'  => (new PersonController)->delete(),
+    'formAddPerson'  => (new PersonController)->formAddPerson(),
+    'addPerson'      => (new PersonController)->addPerson(),
+    'editPerson'     => (new PersonController)->editPerson(),
+    'updatePerson'   => (new PersonController)->updatePerson(),
 
     // Báo cáo
     'list-baocao'    => (new BaocaoController)->index(),
@@ -36,24 +42,16 @@ match ($action) {
     'edit-baocao'    => (new BaocaoController)->edit(),
     'update-baocao'  => (new BaocaoController)->update(),
     'delete-baocao'  => (new BaocaoController)->delete(),
-
-    // NEW
     'detail-baocao'  => (new BaocaoController)->detail(),
     'export-baocao'  => (new BaocaoController)->exportCsv(),
 
-    // personal
-    'person' => (new PersonController) -> index(),
-    'delete' => (new PersonController) -> delete(),
-    'formAddPerson' => (new PersonController) -> formAddPerson(),
-    'addPerson' => (new PersonController) -> addPerson(),
-    'editPerson' => (new PersonController) -> editPerson(),
-    'updatePerson' => (new PersonController) -> updatePerson(),
-
-
     // Booking
-    'list-booking'  => (new BookingController)->index(),
-    // 'add-booking'   => (new BookingController)->add(),
-    // 'store-booking' => (new BookingController)->store(),
+'list-booking'        => (new BookingController)->index(),
+'add-booking'         => (new BookingController)->add(),
+'edit-status-booking' => (new BookingController)->editStatus(),
+'detail-booking'      => (new BookingController)->detail(),
+'delete-booking'      => (new BookingController)->delete(),
+
 
 
     default          => (new TourController)->index(),
