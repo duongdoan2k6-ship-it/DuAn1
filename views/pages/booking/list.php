@@ -84,7 +84,7 @@
                                     <i class="material-symbols-rounded text-sm me-1">Chi tiết</i>
                                 </a>
                                 <a href="?action=edit-booking&id=<?= $item['MaDatTour'] ?>" class="btn btn-sm bg-gradient-dark text-white rounded-pill px-3 py-1 shadow-sm" title="Sửa">
-                                    <i class="material-symbols-rounded text-sm me-1">Sửa</i> 
+                                    <i class="material-symbols-rounded text-sm me-1">Sửa</i>
                                 </a>
                                 <?php if (strpos($item['TenTrangThai'], 'Hủy') === false): ?>
                                     <a href="?action=cancel-booking&id=<?= $item['MaDatTour'] ?>"

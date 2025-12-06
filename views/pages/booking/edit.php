@@ -9,9 +9,9 @@ $bookedSeats = $booking['SoChoDaDat'] ?? 0;
 $currentGuests = $booking['SoLuongKhach'] ?? 0;
 
 // Số ghế trống thực tế trên xe (cho người khác)
-$seatsLeftOnBus = $maxSeats - $bookedSeats; 
+$seatsLeftOnBus = $maxSeats - $bookedSeats;
 // Giới hạn tối đa riêng cho đơn này (= Ghế trống + Ghế đơn này đang giữ)
-$maxLimitForThisBooking = $seatsLeftOnBus + $currentGuests; 
+$maxLimitForThisBooking = $seatsLeftOnBus + $currentGuests;
 
 // Màu sắc hiển thị ban đầu
 $seatColor = 'text-success';
@@ -26,20 +26,20 @@ elseif ($seatsLeftOnBus < 5) $seatColor = 'text-warning';
                 <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
                     <div class="bg-gradient-warning shadow-warning border-radius-lg pt-4 pb-3 d-flex justify-content-between align-items-center px-4">
                         <h6 class="text-white text-capitalize mb-0">
-                            <?= $allowEdit ? 'Cập Nhật Đơn Hàng' : 'Chi Tiết Đơn Hàng' ?> #<?= $booking['MaDatTour'] ?>
+                            <?= $allowEdit ? 'Cập Nhật Đơn Hàng' : 'Chi Tiết Đơn Hàng' ?> <?= $booking['MaDatTour'] ?>
                         </h6>
                         <a href="?action=list-booking" class="btn btn-sm btn-light text-warning fw-bold mb-0">
-                            <i class="material-symbols-rounded text-sm me-1">arrow_back</i> Quay lại
+                            <i class="material-symbols-rounded text-sm me-1">Quay lại</i>
                         </a>
                     </div>
                 </div>
 
                 <div class="card-body">
-                    
+
                     <?php if (!$allowEdit): ?>
                         <div class="alert alert-danger text-white mb-4" role="alert">
-                            <i class="material-symbols-rounded text-sm me-1">lock</i>
-                            Đơn hàng này đã hoàn tất hoặc đã hủy. Bạn không thể chỉnh sửa thông tin được nữa.
+                            <i class="material-symbols-rounded text-sm me-1">Đơn hàng này đã hoàn tất hoặc đã hủy. Bạn không thể chỉnh sửa thông tin được nữa.</i>
+
                         </div>
                     <?php endif; ?>
 
@@ -55,31 +55,29 @@ elseif ($seatsLeftOnBus < 5) $seatColor = 'text-warning';
                                     <div class="input-group input-group-outline bg-white is-filled">
                                         <select name="MaTrangThai" class="form-control fw-bold text-primary" <?= $disabled ?>>
                                             <?php foreach ($listTrangThai as $tt): ?>
-                                                <option value="<?= $tt['MaTrangThai'] ?>" 
+                                                <option value="<?= $tt['MaTrangThai'] ?>"
                                                     <?= ($booking['MaTrangThai'] == $tt['MaTrangThai']) ? 'selected' : '' ?>>
                                                     <?= $tt['TenTrangThai'] ?>
                                                 </option>
                                             <?php endforeach; ?>
                                         </select>
                                     </div>
-                                    <?php if ($allowEdit): ?>
-                                        <small class="text-muted fst-italic">Bạn có thể chuyển sang "Đã xác nhận" hoặc "Đã hủy".</small>
-                                    <?php endif; ?>
+
                                 </div>
 
                                 <div class="mb-3">
                                     <label class="form-label fw-bold">Tên khách hàng</label>
                                     <div class="input-group input-group-outline is-filled">
-                                        <input type="text" name="TenKhachHang" class="form-control" 
-                                               value="<?= $booking['TenKhachHang'] ?>" required <?= $disabled ?>>
+                                        <input type="text" name="TenKhachHang" class="form-control"
+                                            value="<?= $booking['TenKhachHang'] ?>" required <?= $disabled ?>>
                                     </div>
                                 </div>
 
                                 <div class="mb-3">
                                     <label class="form-label fw-bold">Thông tin liên hệ</label>
                                     <div class="input-group input-group-outline is-filled">
-                                        <input type="text" name="LienHeKhachHang" class="form-control" 
-                                               value="<?= $booking['LienHeKhachHang'] ?>" required <?= $disabled ?>>
+                                        <input type="text" name="LienHeKhachHang" class="form-control"
+                                            value="<?= $booking['LienHeKhachHang'] ?>" required <?= $disabled ?>>
                                     </div>
                                 </div>
 
@@ -93,23 +91,25 @@ elseif ($seatsLeftOnBus < 5) $seatColor = 'text-warning';
 
                             <div class="col-md-6 border-start bg-light rounded p-3">
                                 <h5 class="mb-3 text-secondary">2. Thông tin Tour & Số lượng</h5>
-                                
+
                                 <div class="mb-3">
                                     <label class="fw-bold text-xs text-uppercase text-secondary">Tên Tour</label>
                                     <p class="fw-bold text-dark mb-1"><?= $booking['TenTour'] ?></p>
                                     <input type="hidden" name="MaLichKhoiHanh" value="<?= $booking['MaLichKhoiHanh'] ?>">
 
                                     <div class="d-flex align-items-center mt-2 p-2 border rounded bg-white shadow-sm">
-                                        <i id="statusIcon" class="material-symbols-rounded <?= $seatColor ?> me-2">event_seat</i>
-                                        <div>
-                                            <span class="text-xs text-secondary text-uppercase fw-bold">Tình trạng chỗ:</span>
-                                            <span id="statusText" class="fw-bold <?= $seatColor ?> fs-6 ms-1">
-                                                <?= ($seatsLeftOnBus > 0) ? "Còn dư $seatsLeftOnBus ghế" : "Đã hết ghế trống" ?>
-                                            </span>
-                                            <div class="text-xs text-muted">
-                                                (Đơn này đang giữ: <?= $currentGuests ?> ghế)
+                                        <i id="statusIcon" class="material-symbols-rounded <?= $seatColor ?> me-2">
+                                            <div>
+                                                <span class="text-xs text-secondary text-uppercase fw-bold">Tình trạng chỗ:</span>
+                                                <span id="statusText" class="fw-bold <?= $seatColor ?> fs-6 ms-1">
+                                                    <?= ($seatsLeftOnBus > 0) ? "Còn dư $seatsLeftOnBus ghế" : "Đã hết ghế trống" ?>
+                                                </span>
+                                                <div class="text-xs text-muted">
+                                                    (Đơn này đang giữ: <?= $currentGuests ?> ghế)
+                                                </div>
                                             </div>
-                                        </div>
+                                        </i>
+
                                     </div>
                                 </div>
 
@@ -120,21 +120,20 @@ elseif ($seatsLeftOnBus < 5) $seatColor = 'text-warning';
                                 <div class="row mb-3">
                                     <div class="col-6">
                                         <label class="fw-bold text-xs text-uppercase text-secondary">Người lớn</label>
-                                        <input type="number" name="SoLuongNguoiLon" id="inputAdult" class="form-control border px-2 bg-white fw-bold" 
-                                               value="<?= $booking['SoLuongNguoiLon'] ?? $booking['SoLuongKhach'] ?>" min="1" required <?= $disabled ?>>
+                                        <input type="number" name="SoLuongNguoiLon" id="inputAdult" class="form-control border px-2 bg-white fw-bold"
+                                            value="<?= $booking['SoLuongNguoiLon'] ?? $booking['SoLuongKhach'] ?>" min="1" required <?= $disabled ?>>
                                         <small class="text-muted text-xs">Giá: <?= number_format($booking['GiaNguoiLon']) ?></small>
                                     </div>
                                     <div class="col-6">
                                         <label class="fw-bold text-xs text-uppercase text-secondary">Trẻ em</label>
-                                        <input type="number" name="SoLuongTreEm" id="inputChild" class="form-control border px-2 bg-white fw-bold" 
-                                               value="<?= $booking['SoLuongTreEm'] ?? 0 ?>" min="0" <?= $disabled ?>>
+                                        <input type="number" name="SoLuongTreEm" id="inputChild" class="form-control border px-2 bg-white fw-bold"
+                                            value="<?= $booking['SoLuongTreEm'] ?? 0 ?>" min="0" <?= $disabled ?>>
                                         <small class="text-muted text-xs">Giá: <?= number_format($booking['GiaTreEm']) ?></small>
                                     </div>
                                 </div>
 
                                 <div id="limitAlert" class="alert alert-danger text-white text-xs mb-3 d-none">
-                                    <i class="material-symbols-rounded text-xs me-1">block</i>
-                                    Không thể thêm! Chuyến đi chỉ còn tối đa <b><?= $maxLimitForThisBooking ?></b> chỗ (bao gồm chỗ của bạn).
+                                    <i class="material-symbols-rounded text-xs me-1">Không thể thêm! Chuyến đi chỉ còn tối đa <b><?= $maxLimitForThisBooking ?></b> chỗ.</i>
                                 </div>
 
                                 <hr>
@@ -148,15 +147,15 @@ elseif ($seatsLeftOnBus < 5) $seatColor = 'text-warning';
                         </div>
 
                         <?php if ($allowEdit): ?>
-                        <div class="row mt-4">
-                            <div class="col-12">
-                                <button type="submit" class="btn btn-warning bg-gradient-warning text-white w-100 fw-bold">
-                                    <i class="material-symbols-rounded text-sm me-1">save</i> CẬP NHẬT THÔNG TIN
-                                </button>
+                            <div class="row mt-4">
+                                <div class="col-12">
+                                    <button type="submit" class="btn btn-warning bg-gradient-warning text-white w-100 fw-bold">
+                                        <i class="material-symbols-rounded text-sm me-1">CẬP NHẬT THÔNG TIN</i>
+                                    </button>
+                                </div>
                             </div>
-                        </div>
                         <?php endif; ?>
-                        
+
                     </form>
                 </div>
             </div>
@@ -169,12 +168,12 @@ elseif ($seatsLeftOnBus < 5) $seatColor = 'text-warning';
     const inputChild = document.getElementById('inputChild');
     const priceAdult = parseFloat(document.getElementById('priceAdult').value) || 0;
     const priceChild = parseFloat(document.getElementById('priceChild').value) || 0;
-    const maxLimit   = parseInt(document.getElementById('maxLimit').value) || 0; 
-    
+    const maxLimit = parseInt(document.getElementById('maxLimit').value) || 0;
+
     const displayTotal = document.getElementById('displayTotal');
     const inputTotal = document.getElementById('inputTotal');
     const limitAlert = document.getElementById('limitAlert');
-    
+
     // Các phần tử hiển thị trạng thái ghế
     const statusText = document.getElementById('statusText');
     const statusIcon = document.getElementById('statusIcon');
@@ -187,7 +186,7 @@ elseif ($seatsLeftOnBus < 5) $seatColor = 'text-warning';
         // 1. LOGIC CHẶN NHẬP LIỆU QUÁ GIỚI HẠN
         if (currentTotal > maxLimit) {
             limitAlert.classList.remove('d-none');
-            
+
             // Tự động sửa về mức tối đa
             if (e && e.target === inputAdult) {
                 inputAdult.value = maxLimit - qtyC;
@@ -205,7 +204,7 @@ elseif ($seatsLeftOnBus < 5) $seatColor = 'text-warning';
         // 2. LOGIC CẬP NHẬT SỐ GHẾ DƯ REALTIME (MỚI)
         // Số ghế dư = Giới hạn tối đa - Tổng số khách đang nhập
         let remainingSeats = maxLimit - currentTotal;
-        
+
         if (remainingSeats > 0) {
             statusText.innerText = "Còn dư " + remainingSeats + " ghế";
             statusText.className = "fw-bold text-success fs-6 ms-1";
@@ -223,7 +222,7 @@ elseif ($seatsLeftOnBus < 5) $seatColor = 'text-warning';
     }
 
     // Gắn sự kiện
-    if(inputAdult && inputChild) {
+    if (inputAdult && inputChild) {
         inputAdult.addEventListener('input', updateFormLogic);
         inputChild.addEventListener('input', updateFormLogic);
     }

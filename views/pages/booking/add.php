@@ -6,7 +6,7 @@
                     <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3 d-flex justify-content-between align-items-center px-4">
                         <h6 class="text-white text-capitalize mb-0">Thêm Mới Booking</h6>
                         <a href="?action=list-booking" class="btn btn-sm btn-light text-primary mb-0">
-                            <i class="material-symbols-rounded text-sm me-1">Quay lại</i> 
+                            <i class="material-symbols-rounded text-sm me-1">Quay lại</i>
                         </a>
                     </div>
                 </div>
@@ -66,18 +66,18 @@
 
                                             <?php if (!empty($listLich)): ?>
                                                 <?php foreach ($listLich as $sche): ?>
-                                                    <?php 
-                                                        $conTrong = $sche['SoChoToiDa'] - $sche['SoChoDaDat'];
-                                                        $giaNL = number_format($sche['GiaNguoiLon']);
-                                                        $ngayDi = date('d/m/Y', strtotime($sche['NgayKhoiHanh']));
+                                                    <?php
+                                                    $conTrong = $sche['SoChoToiDa'] - $sche['SoChoDaDat'];
+                                                    $giaNL = number_format($sche['GiaNguoiLon']);
+                                                    $ngayDi = date('d/m/Y', strtotime($sche['NgayKhoiHanh']));
                                                     ?>
                                                     <option value="<?= $sche['MaLichKhoiHanh'] ?>"
-                                                            data-price-adult="<?= $sche['GiaNguoiLon'] ?>"
-                                                            data-price-child="<?= $sche['GiaTreEm'] ?>"
-                                                            data-seats-left="<?= $conTrong ?>" 
-                                                            <?= ($conTrong <= 0) ? 'disabled' : '' ?>>
-                                                        
-                                                        <?= $sche['TenTour'] ?> - <?= $ngayDi ?> 
+                                                        data-price-adult="<?= $sche['GiaNguoiLon'] ?>"
+                                                        data-price-child="<?= $sche['GiaTreEm'] ?>"
+                                                        data-seats-left="<?= $conTrong ?>"
+                                                        <?= ($conTrong <= 0) ? 'disabled' : '' ?>>
+
+                                                        <?= $sche['TenTour'] ?> - <?= $ngayDi ?>
                                                         (<?= $giaNL ?>đ) - Còn <?= $conTrong ?> chỗ
                                                     </option>
                                                 <?php endforeach; ?>
@@ -86,13 +86,15 @@
                                             <?php endif; ?>
                                         </select>
                                     </div>
-                                    
+
                                     <div id="seatInfoBox" class="d-flex align-items-center mt-2 p-2 border rounded bg-white shadow-sm d-none">
-                                        <i id="statusIcon" class="material-symbols-rounded me-2">event_seat</i>
-                                        <div>
-                                            <span class="text-xs text-secondary text-uppercase fw-bold">Tình trạng chỗ:</span>
-                                            <span id="statusText" class="fw-bold fs-6 ms-1"></span>
-                                        </div>
+                                        <i id="statusIcon" class="material-symbols-rounded me-2">
+                                            <div>
+                                                <span class="text-xs text-secondary text-uppercase fw-bold">Tình trạng chỗ:</span>
+                                                <span id="statusText" class="fw-bold fs-6 ms-1"></span>
+                                            </div>
+                                        </i>
+
                                     </div>
                                 </div>
 
@@ -147,7 +149,7 @@
     const inputTE = document.getElementById('inputTE');
     const displayTongTien = document.getElementById('displayTongTien');
     const inputTongTien = document.getElementById('inputTongTien');
-    
+
     // Các element hiển thị thông tin
     const seatInfoBox = document.getElementById('seatInfoBox');
     const statusText = document.getElementById('statusText');
@@ -161,10 +163,10 @@
     function updateFormLogic(e) {
         // 1. Lấy thông tin từ Option được chọn
         const selectedOption = selectLich.options[selectLich.selectedIndex];
-        
+
         const priceAdult = parseFloat(selectedOption.getAttribute('data-price-adult')) || 0;
         const priceChild = parseFloat(selectedOption.getAttribute('data-price-child')) || 0;
-        
+
         // Nếu thay đổi dropdown, cập nhật lại Max Seats
         if (e && e.target === selectLich) {
             currentMaxSeats = parseInt(selectedOption.getAttribute('data-seats-left')) || 0;
@@ -207,7 +209,7 @@
         // 4. HIỂN THỊ TRẠNG THÁI GHẾ (REALTIME)
         if (selectedOption.value !== "") {
             seatInfoBox.classList.remove('d-none');
-            
+
             // Tính số ghế còn dư sau khi trừ đi số khách đang nhập
             let remainingSeats = currentMaxSeats - currentTotal;
 
@@ -226,9 +228,9 @@
 
         // 5. TÍNH TIỀN
         const total = (qtyA * priceAdult) + (qtyC * priceChild);
-        
+
         displayTongTien.value = new Intl.NumberFormat('vi-VN').format(total) + ' VNĐ';
-        if(inputTongTien) inputTongTien.value = total;
+        if (inputTongTien) inputTongTien.value = total;
     }
 
     // Gán sự kiện

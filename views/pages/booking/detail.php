@@ -7,10 +7,10 @@
                         <h6 class="text-white text-capitalize mb-0">Chi tiết Booking <?= $booking['MaDatTour'] ?></h6>
                         <div>
                             <a href="?action=edit-booking&id=<?= $booking['MaDatTour'] ?>" class="btn btn-sm btn-light text-info fw-bold mb-0 me-2">
-                                <i class="material-symbols-rounded text-sm me-1">Sửa</i> 
+                                <i class="material-symbols-rounded text-sm me-1">Sửa</i>
                             </a>
                             <a href="?action=list-booking" class="btn btn-sm btn-light text-dark fw-bold mb-0">
-                                <i class="material-symbols-rounded text-sm me-1">Quay lại</i> 
+                                <i class="material-symbols-rounded text-sm me-1">Quay lại</i>
                             </a>
                         </div>
                     </div>
@@ -40,7 +40,7 @@
                     <div class="row">
                         <div class="col-md-6 border-end">
                             <h5 class="mb-3 text-info border-bottom pb-2">
-                                <i class="material-symbols-rounded align-middle me-1">Thông tin Khách hàng</i> 
+                                <i class="material-symbols-rounded align-middle me-1">Thông tin Khách hàng</i>
                             </h5>
 
                             <div class="p-3 bg-light rounded mb-3">
@@ -52,7 +52,7 @@
                                     <div class="col-4 fw-bold text-secondary">Liên hệ:</div>
                                     <div class="col-8"><?= $booking['LienHeKhachHang'] ?></div>
                                 </div>
-                                </div>
+                            </div>
 
                             <h6 class="mb-2 text-dark font-weight-bold">Ghi chú từ khách hàng:</h6>
                             <div class="p-3 border rounded bg-white" style="min-height: 100px;">
@@ -66,7 +66,7 @@
 
                         <div class="col-md-6 ps-md-4">
                             <h5 class="mb-3 text-info border-bottom pb-2">
-                                <i class="material-symbols-rounded align-middle me-1">Chi tiết Tour & Lịch trình</i> 
+                                <i class="material-symbols-rounded align-middle me-1">Chi tiết Tour & Lịch trình</i>
                             </h5>
 
                             <div class="mb-3">
@@ -99,7 +99,7 @@
                             <hr class="dark horizontal my-4">
 
                             <h5 class="mb-3 text-info border-bottom pb-2">
-                                <i class="material-symbols-rounded align-middle me-1">Chi tiết Thanh toán</i> 
+                                <i class="material-symbols-rounded align-middle me-1">Chi tiết Thanh toán</i>
                             </h5>
 
                             <ul class="list-group list-group-flush mb-3">
@@ -129,7 +129,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="card-footer p-3">
                     <?php if ($booking['MaTrangThai'] == 1): ?>
                         <div class="alert alert-warning text-white text-center mb-0" role="alert">
