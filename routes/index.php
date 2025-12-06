@@ -48,8 +48,9 @@ match ($action) {
     // Booking
     'list-booking'   => (new BookingController)->index(),
     'add-booking'    => (new BookingController)->add(), 
-    // 'edit-booking'   => (new BookingController)->edit(), 
-    // 'update-booking' => (new BookingController)->update(),
+    'store-booking'    => (new BookingController)->store(), 
+    'edit-booking'   => (new BookingController)->edit(), 
+    'update-booking' => (new BookingController)->update(),
     'cancel-booking' => (new BookingController)->cancel(),
     'detail-booking' => (new BookingController)->detail(),
 

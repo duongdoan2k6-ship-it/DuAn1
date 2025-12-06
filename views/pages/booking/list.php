@@ -82,11 +82,9 @@
                             <td class="align-middle text-center">
                                 <a href="?action=detail-booking&id=<?= $item['MaDatTour'] ?>" class="btn btn-sm bg-gradient-info text-white rounded-pill px-3 py-1 me-2 shadow-sm" title="Chi tiết">
                                     <i class="material-symbols-rounded text-sm me-1">Chi tiết</i>
-
                                 </a>
-                                <a href="#" class="btn btn-sm bg-gradient-dark text-white rounded-pill px-3 py-1 shadow-sm" title="Sửa">
-                                    <i class="material-symbols-rounded text-sm me-1">Sửa</i>
-
+                                <a href="?action=edit-booking&id=<?= $item['MaDatTour'] ?>" class="btn btn-sm bg-gradient-dark text-white rounded-pill px-3 py-1 shadow-sm" title="Sửa">
+                                    <i class="material-symbols-rounded text-sm me-1">Sửa</i> 
                                 </a>
                                 <?php if (strpos($item['TenTrangThai'], 'Hủy') === false): ?>
                                     <a href="?action=cancel-booking&id=<?= $item['MaDatTour'] ?>"
