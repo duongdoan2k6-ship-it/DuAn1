@@ -53,6 +53,7 @@ match ($action) {
     'update-booking' => (new BookingController)->update(),
     'cancel-booking' => (new BookingController)->cancel(),
     'detail-booking' => (new BookingController)->detail(),
+    'delete-booking' => (new BookingController)->delete(),
 
 
 

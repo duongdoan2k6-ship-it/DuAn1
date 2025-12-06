@@ -191,14 +191,15 @@ class BookingModel extends BaseModel
 
     // --- Thay thế hàm updateBooking cũ trong models/BookingModel.php ---
 
-    public function updateBooking($id, $data) {
+    public function updateBooking($id, $data)
+    {
         try {
             // 1. Lấy thông tin đơn hàng CŨ
             $oldBooking = $this->findById($id);
             if (!$oldBooking) return false;
-            
+
             // Tính toán chênh lệch khách
-            $oldTotalGuests = $oldBooking['SoLuongKhach']; 
+            $oldTotalGuests = $oldBooking['SoLuongKhach'];
             $newTotalGuests = $data['SoLuongNguoiLon'] + $data['SoLuongTreEm'];
             $diff = $newTotalGuests - $oldTotalGuests;
 
@@ -219,10 +220,10 @@ class BookingModel extends BaseModel
 
             // 3. Xử lý Hủy (nếu có)
             if ($data['MaTrangThai'] == 3) {
-                 if ($oldBooking['MaTrangThai'] != 3) {
-                     $this->cancelBooking($id); 
-                     return true; 
-                 }
+                if ($oldBooking['MaTrangThai'] != 3) {
+                    $this->cancelBooking($id);
+                    return true;
+                }
             }
 
             // 4. CẬP NHẬT DATABASE (Đã xóa dòng NgayCapNhat gây lỗi)
@@ -234,7 +235,7 @@ class BookingModel extends BaseModel
                         SoLuongKhach = :slTong,
                         TongTien = :tongTien
                     WHERE MaDatTour = :id";
-            
+
             $stmt = $this->conn->prepare($sql);
             $stmt->execute([
                 'ten'      => $data['TenKhachHang'],
@@ -247,7 +248,7 @@ class BookingModel extends BaseModel
             ]);
 
             // 5. CẬP NHẬT LỊCH TRÌNH
-            if ($diff != 0 && $data['MaTrangThai'] != 3) { 
+            if ($diff != 0 && $data['MaTrangThai'] != 3) {
                 $sqlUpdateLich = "UPDATE lichkhoihanh 
                                   SET SoChoDaDat = SoChoDaDat + :diff 
                                   WHERE MaLichKhoiHanh = :maLich";
@@ -258,9 +259,32 @@ class BookingModel extends BaseModel
             }
 
             return true;
-
         } catch (Exception $e) {
-            echo "Lỗi SQL: " . $e->getMessage(); die();
+            echo "Lỗi SQL: " . $e->getMessage();
+            die();
+            return false;
+        }
+    }
+    public function getBookingById($id)
+    {
+        try {
+            $sql = "SELECT * FROM dattour WHERE MaDatTour = :id";
+            $stmt = $this->conn->prepare($sql);
+            $stmt->execute([':id' => $id]);
+            return $stmt->fetch();
+        } catch (Exception $e) {
+            return null;
+        }
+    }
+
+    public function deleteBooking($id)
+    {
+        try {
+            $sql = "DELETE FROM dattour WHERE MaDatTour = :id";
+            $stmt = $this->conn->prepare($sql);
+            $stmt->execute([':id' => $id]);
+            return $stmt->rowCount() > 0;
+        } catch (Exception $e) {
             return false;
         }
     }

@@ -172,4 +172,42 @@ class BookingController extends BaseController
             exit();
         }
     }
+    public function delete()
+    {
+        $id = $_GET['id'] ?? null;
+
+        if ($id) {
+            $bookingModel = new BookingModel();
+
+            // 1. Lấy thông tin booking để kiểm tra trạng thái
+            $booking = $bookingModel->getBookingById($id);
+
+            if ($booking) {
+                // 2. KIỂM TRA QUAN TRỌNG:
+                // Dựa vào ảnh bạn gửi: MaTrangThai = 3 là "Đã huỷ"
+                if ($booking['MaTrangThai'] == 3) {
+
+                    // Thỏa mãn là "Đã huỷ" -> Cho phép xóa
+                    $result = $bookingModel->deleteBooking($id);
+
+                    if ($result) {
+                        $_SESSION['alert_message'] = "Đã xóa đơn đặt tour #$id thành công!";
+                    } else {
+                        $_SESSION['alert_message'] = "Lỗi hệ thống: Không thể xóa đơn này.";
+                    }
+                } else {
+                    // Nếu MaTrangThai không phải 3 (VD: là 1 hoặc 2)
+                    $_SESSION['alert_message'] = "Cảnh báo: Chỉ được xóa các đơn đã có trạng thái 'Đã huỷ'.";
+                }
+            } else {
+                $_SESSION['alert_message'] = "Lỗi: Không tìm thấy đơn đặt tour #$id.";
+            }
+        } else {
+            $_SESSION['alert_message'] = "Lỗi: Thiếu ID để xóa.";
+        }
+
+        // Quay về danh sách
+        header("Location: ?action=list-booking");
+        exit();
+    }
 }
