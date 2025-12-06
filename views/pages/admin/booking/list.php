@@ -15,6 +15,7 @@
                     <tr>
                         <th class="text-uppercase text-secondary text-xxs font-weight-bolder">ID</th>
                         <th class="text-uppercase text-secondary text-xxs font-weight-bolder ps-2">Khách Hàng</th>
+                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder ps-2">Tên tour</th>
                         <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Lịch Trình</th>
                         <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">SL Khách</th>
                         <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Tổng Tiền</th>
@@ -43,10 +44,15 @@
                             </td>
 
                             <!-- Lịch trình -->
-                            <td class="align-middle text-center">
-                                <span class="text-secondary text-sm">
-                                    <?= date('d/m', strtotime($item['NgayKhoiHanh'])) ?> - <?= date('d/m/Y', strtotime($item['NgayKetThuc'])) ?>
-                                </span>
+                            <td class="px-3">
+                                <div class="d-flex flex-column justify-content-center">
+                                    <h6 class="mb-0 text-sm fw-bold text-wrap" style="max-width: 250px;">
+                                        <?= $item['TenTour'] ?>
+                                    </h6>
+                                    <p class="text-xs text-secondary mb-0">
+                                        <?= date('d/m', strtotime($item['NgayKhoiHanh'])) ?> - <?= date('d/m/Y', strtotime($item['NgayKetThuc'])) ?>
+                                    </p>
+                                </div>
                             </td>
 
                             <!-- Số lượng khách -->
@@ -84,7 +90,7 @@
                                     <i class="material-symbols-rounded text-sm me-1">Chi tiết</i></a>
 
                                 <a href="?action=edit-booking&id=<?= $item['MaDatTour'] ?>" class="btn btn-sm bg-gradient-dark text-white rounded-pill px-3 py-1 me-2 shadow-sm" title="Sửa">
-                                    <i class="material-symbols-rounded text-sm me-1">Sửa</i> 
+                                    <i class="material-symbols-rounded text-sm me-1">Sửa</i>
                                 </a>
 
                                 <?php if (strpos($item['TenTrangThai'], 'Hủy') === false): ?>
@@ -92,7 +98,7 @@
                                         onclick="return confirm('Bạn có chắc chắn muốn HUỶ booking này không? Dữ liệu sẽ được lưu lại với trạng thái Đã Huỷ.');"
                                         class="btn btn-sm bg-gradient-warning text-white rounded-pill px-3 py-1 me-2 shadow-sm"
                                         title="Huỷ Booking">
-                                        <i class="material-symbols-rounded text-sm me-1">Huỷ</i> 
+                                        <i class="material-symbols-rounded text-sm me-1">Huỷ</i>
                                     </a>
                                 <?php endif; ?>
 
@@ -100,7 +106,7 @@
                                     onclick="return confirm('CẢNH BÁO: Bạn có chắc chắn muốn XÓA VĨNH VIỄN booking này không? Hành động này không thể hoàn tác!');"
                                     class="btn btn-sm bg-gradient-danger text-white rounded-pill px-3 py-1 shadow-sm"
                                     title="Xóa vĩnh viễn">
-                                    <i class="material-symbols-rounded text-sm me-1">Xóa</i> 
+                                    <i class="material-symbols-rounded text-sm me-1">Xóa</i>
                                 </a>
                             </td>
                         </tr>

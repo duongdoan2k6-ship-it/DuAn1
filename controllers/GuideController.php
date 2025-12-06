@@ -11,7 +11,7 @@ class GuideController extends BaseController
 
     public function danhSachKhach()
     {
-        $id_hdv = 1;
+        $id_hdv = 5;
         $list_khach = $this->tourModel->getKhachTheoDoan($id_hdv);
 
         $data = [

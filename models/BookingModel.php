@@ -280,11 +280,19 @@ class BookingModel extends BaseModel
     public function deleteBooking($id)
     {
         try {
-            $sql = "DELETE FROM dattour WHERE MaDatTour = :id";
-            $stmt = $this->conn->prepare($sql);
-            $stmt->execute([':id' => $id]);
-            return $stmt->rowCount() > 0;
+            $this->conn->beginTransaction();
+            $sqlDelGuest = "DELETE FROM khachthamgiatour WHERE MaDatTour = :id";
+            $stmtGuest = $this->conn->prepare($sqlDelGuest);
+            $stmtGuest->execute([':id' => $id]);
+
+            $sqlDelBooking = "DELETE FROM dattour WHERE MaDatTour = :id";
+            $stmtBooking = $this->conn->prepare($sqlDelBooking);
+            $stmtBooking->execute([':id' => $id]);
+
+            $this->conn->commit();
+            return true;
         } catch (Exception $e) {
+            $this->conn->rollBack();
             return false;
         }
     }

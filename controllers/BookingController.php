@@ -70,10 +70,10 @@ class BookingController extends BaseController
             $result = $this->bookingModel->cancelBooking($MaDatTour);
 
             if ($result) {
-                $_SESSION['alert_message'] = "Đã huỷ booking thành công!";
+                $_SESSION['alert_message'] = "Đã huỷ booking và hoàn lại chỗ trống thành công!";
                 $_SESSION['alert_type'] = "success";
             } else {
-                $_SESSION['alert_message'] = "KHÔNG THỂ HUỶ: Chỉ được huỷ đơn 'Chờ xác nhận'!";
+                $_SESSION['alert_message'] = "Lỗi: Đơn này đã huỷ rồi hoặc không tồn tại.";
                 $_SESSION['alert_type'] = "error";
             }
         }

@@ -17,7 +17,7 @@ class PersonController extends BaseController
             'pageTitle' => 'Danh sách nhân sự'
         ];
 
-        $this->renderView('pages/person/nhanSu.php', $data);
+        $this->renderView('pages/admin/person/nhanSu.php', $data);
     }
 
     public function delete()
@@ -32,7 +32,7 @@ class PersonController extends BaseController
 
     public function formAddPerson()
     {
-        $this->renderView('pages/person/addPerson.php');
+        $this->renderView('pages/admin/person/addPerson.php');
     }
 
     public function addPerson()
@@ -95,7 +95,7 @@ class PersonController extends BaseController
                 exit();
             }
 
-            $this->renderView('pages/person/editPerson.php', [
+            $this->renderView('pages/admin/person/editPerson.php', [
                 'person' => $person
             ]);
         }

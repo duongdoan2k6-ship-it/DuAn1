@@ -10,9 +10,6 @@ $current_year = date('Y');
             <h6 class="m-0 font-weight-bold text-white text-uppercase">
                 <i class="fas fa-users me-2"></i> DANH SÁCH KHÁCH TRONG ĐOÀN
             </h6>
-            <button onclick="window.print()" class="btn btn-light btn-sm text-primary shadow-sm fw-bold">
-                <i class="fas fa-print me-1"></i> In danh sách
-            </button>
         </div>
 
         <div class="card-body p-0">
@@ -123,7 +120,7 @@ $current_year = date('Y');
                                     </td>
                                     
                                 </tr>
-                            <?php $stt_thanh_vien++; // TĂNG STT THÀNH VIÊN SAU MỖI HÀNG ?>
+                            <?php $stt_thanh_vien++; ?>
                             <?php endforeach;
                         else: ?>
                             <tr>
@@ -142,20 +139,5 @@ $current_year = date('Y');
 </div>
 
 <style>
-@media print {
-    .sidebar, header, .navbar, .footer, .btn, .modal {
-        display: none !important;
-    }
-    .main-content, .card, .container-fluid {
-        width: 100% !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        box-shadow: none !important;
-        border: none !important;
-    }
-    body {
-        background: white;
-    }
-    a { text-decoration: none; color: black; }
-}
+
 </style>
