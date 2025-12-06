@@ -8,6 +8,8 @@ require_once $projectRoot . '/controllers/TourController.php';
 require_once $projectRoot . '/controllers/PersonController.php';
 require_once $projectRoot . '/controllers/BaocaoController.php';
 require_once $projectRoot . '/controllers/BookingController.php';
+require_once $projectRoot . '/controllers/GuideController.php';
+
 
 require_once $projectRoot . '/models/BaseModel.php';
 require_once $projectRoot . '/models/TourModel.php';
@@ -27,6 +29,9 @@ match ($action) {
     'edit-tour'      => (new TourController)->edit(),
     // 'delete-tour'    => (new TourController)->delete(),
     'detail-tour'    => (new TourController)->detail(),
+
+    // Hướng Dẫn Viên (Guide)
+    'guide-list-guests' => (new GuideController)->danhSachKhach(),
 
     // Person
     'person'         => (new PersonController)->index(),
@@ -55,6 +60,7 @@ match ($action) {
     'detail-booking' => (new BookingController)->detail(),
     'delete-booking' => (new BookingController)->delete(),
 
+    //
 
 
     default          => (new TourController)->index(),

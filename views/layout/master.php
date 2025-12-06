@@ -23,52 +23,100 @@
 
 <body class="g-sidenav-show  bg-gray-200">
 
-    <aside class="sidenav navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-3   bg-gradient-dark" id="sidenav-main">
+    <aside class="sidenav navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-3 bg-gradient-dark"
+        id="sidenav-main">
         <div class="sidenav-header">
             <a class="navbar-brand m-0" href="#">
                 <span class="ms-1 font-weight-bold text-white">Danh mục</span>
             </a>
         </div>
+
         <hr class="horizontal light mt-0 mb-2">
-        <div class="collapse navbar-collapse  w-auto " id="sidenav-collapse-main">
+
+        <div class="collapse navbar-collapse w-auto" id="sidenav-collapse-main">
+
+            <!-- ADMIN -->
+            <span class="ms-1 text-white">Admin</span>
             <ul class="navbar-nav">
+
+                <!-- Trang chủ -->
                 <li class="nav-item">
-                    <a class="nav-link text-white active bg-gradient-primary" href="<?php echo base_url('public/index.php?action=list-tours'); ?>">
-                        <span class="nav-link-text ms-1">Quản lý tour </span>
+                    <a class="nav-link text-white active bg-gradient-primary"
+                        href="<?php echo base_url('public/'); ?>">
+                        <span class="nav-link-text ms-1">Trang chủ</span>
                     </a>
                 </li>
+
+                <!-- Quản lý Tour -->
                 <li class="nav-item">
-                    <a class="nav-link text-white active bg-gradient-primary" href="<?php echo base_url('public/index.php?action=person'); ?>">
+                    <a class="nav-link text-white active bg-gradient-primary"
+                        href="<?php echo base_url('public/index.php?action=list-tours'); ?>">
+                        <span class="nav-link-text ms-1">Quản lý tour</span>
+                    </a>
+                </li>
+
+                <!-- Nhân sự -->
+                <li class="nav-item">
+                    <a class="nav-link text-white active bg-gradient-primary"
+                        href="<?php echo base_url('public/index.php?action=person'); ?>">
                         <span class="nav-link-text ms-1">Danh sách nhân sự</span>
                     </a>
                 </li>
 
+                <!-- Báo cáo tài chính -->
                 <li class="nav-item">
-                    <a class="nav-link text-white active bg-gradient-primary" href="<?php echo base_url('public/index.php?action=list-baocao'); ?>">
+                    <a class="nav-link text-white active bg-gradient-primary"
+                        href="<?php echo base_url('public/index.php?action=list-baocao'); ?>">
                         <span class="nav-link-text ms-1">Báo cáo tài chính</span>
-                    </a>
+</a>
                 </li>
 
+                <!-- Quản lý Booking -->
                 <li class="nav-item">
                     <a class="nav-link text-white active bg-gradient-primary"
                         href="<?php echo base_url('public/index.php?action=list-booking'); ?>">
-                        <span class="nav-link-text ms-1">
-                            Quản lý Booking
-                        </span>
+                        <span class="nav-link-text ms-1">Quản lý Booking</span>
+                    </a>
+                </li>
+
+                <!-- Lịch khởi hành (THÊM) -->
+                <li class="nav-item">
+                    <a class="nav-link text-white active bg-gradient-primary"
+                        href="<?php echo base_url('public/index.php?action=list-lichkhoihanh'); ?>">
+                        <span class="nav-link-text ms-1">Quản lý lịch khởi hành</span>
+                    </a>
+                </li>
+            </ul>
+            
+            <hr class="horizontal light mt-0 mb-2">
+
+            <!-- HƯỚNG DẪN VIÊN -->
+            <span class="ms-1 text-white">Hướng Dẫn Viên</span>
+            <ul class="navbar-nav">
+
+                <!-- DS khách trong đoàn (sửa link bị thiếu) -->
+                <li class="nav-item">
+                    <a class="nav-link text-white active bg-gradient-primary"
+                        href="<?php echo base_url('public/index.php?action=guide-list-guests'); ?>">
+                        <span class="nav-link-text ms-1">Danh sách khách trong đoàn</span>
                     </a>
                 </li>
 
             </ul>
+
         </div>
     </aside>
+
     <main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg ">
-        <nav class="navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl" id="navbarBlur" data-scroll="true">
+        <nav class="navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl" id="navbarBlur"
+            data-scroll="true">
             <div class="container-fluid py-1 px-3">
                 <nav aria-label="breadcrumb">
                     <h6 class="font-weight-bolder mb-0"><?php echo $pageTitle ?? 'Dashboard'; ?></h6>
                 </nav>
             </div>
         </nav>
+
         <div class="container-fluid py-4">
             <?php
             if (isset($viewPage) && is_readable($viewPage)) {
@@ -85,6 +133,7 @@
     <script src="<?php echo asset_url('js/plugins/perfect-scrollbar.min.js'); ?>"></script>
     <script src="<?php echo asset_url('js/plugins/smooth-scrollbar.min.js'); ?>"></script>
     <script src="<?php echo asset_url('js/material-dashboard.min.js?v=3.0.0'); ?>"></script>
+
 </body>
 
 </html>

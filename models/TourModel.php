@@ -164,7 +164,7 @@ class TourModel extends BaseModel
     }
 
     // === CÁC PHƯƠNG THỨC MỚI THÊM ===
-    
+
     public function getSelectedNhaCungCap($maTour)
     {
         $sql = "SELECT MaNhaCungCap FROM tournhacungcap WHERE MaTour = :maTour";
@@ -202,13 +202,13 @@ class TourModel extends BaseModel
     {
         $sql = "INSERT INTO lichtrinhtour (MaTour, SoNgay, TieuDe, HoatDong)
                 VALUES (:maTour, :soNgay, :tieuDe, :hoatDong)";
-        
+
         $stmt = $this->conn->prepare($sql);
         $stmt->bindParam(':maTour', $maTour);
         $stmt->bindParam(':soNgay', $soNgay);
         $stmt->bindParam(':tieuDe', $tieuDe);
         $stmt->bindParam(':hoatDong', $hoatDong);
-        
+
         return $stmt->execute();
     }
 
@@ -216,12 +216,12 @@ class TourModel extends BaseModel
     {
         $sql = "INSERT INTO chinhsachtour (MaTour, TenChinhSach, NoiDungChinhSach)
                 VALUES (:maTour, :ten, :noiDung)";
-        
+
         $stmt = $this->conn->prepare($sql);
         $stmt->bindParam(':maTour', $maTour);
         $stmt->bindParam(':ten', $tenChinhSach);
         $stmt->bindParam(':noiDung', $noiDung);
-        
+
         return $stmt->execute();
     }
 
@@ -229,11 +229,11 @@ class TourModel extends BaseModel
     {
         $sql = "INSERT INTO tournhacungcap (MaTour, MaNhaCungCap)
                 VALUES (:maTour, :maNCC)";
-        
+
         $stmt = $this->conn->prepare($sql);
         $stmt->bindParam(':maTour', $maTour);
         $stmt->bindParam(':maNCC', $maNhaCungCap);
-        
+
         return $stmt->execute();
     }
 
@@ -241,12 +241,12 @@ class TourModel extends BaseModel
     {
         $sql = "INSERT INTO hinhanhtour (MaTour, URLHinhAnh, ChuThich)
                 VALUES (:maTour, :url, :chuThich)";
-        
+
         $stmt = $this->conn->prepare($sql);
         $stmt->bindParam(':maTour', $maTour);
         $stmt->bindParam(':url', $urlHinhAnh);
         $stmt->bindParam(':chuThich', $chuThich);
-        
+
         return $stmt->execute();
     }
 
@@ -255,6 +255,34 @@ class TourModel extends BaseModel
         $sql = "SELECT * FROM hinhanhtour WHERE MaTour = :maTour ORDER BY MaHinhAnh ASC";
         $stmt = $this->conn->prepare($sql);
         $stmt->bindParam(':maTour', $maTour);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
+    public function getKhachTheoDoan($id_hdv)
+    {
+        $id_hdv = intval($id_hdv);
+
+        $sql = "SELECT 
+                dt.MaDatTour,
+                dt.TenKhachHang AS TruongDoan,      
+                dt.LienHeKhachHang AS SDT_LienHe,    
+                kt.MaKhach,                      
+                kt.TenKhachHang AS TenKhach,        
+                kt.GioiTinh,
+                kt.NamSinh,
+                kt.SoCMND_HoChieu
+                
+            FROM phancongtour pct
+            JOIN lichkhoihanh lkh ON pct.MaLichKhoiHanh = lkh.MaLichKhoiHanh
+            JOIN dattour dt ON lkh.MaLichKhoiHanh = dt.MaLichKhoiHanh
+            JOIN khachthamgiatour kt ON dt.MaDatTour = kt.MaDatTour
+            WHERE 
+                pct.MaHDV = $id_hdv 
+                AND dt.MaTrangThai IN (1, 2) 
+            ORDER BY dt.MaDatTour ASC";
+
+        $stmt = $this->conn->prepare($sql);
         $stmt->execute();
         return $stmt->fetchAll();
     }

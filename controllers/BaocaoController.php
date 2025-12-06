@@ -35,7 +35,7 @@ class BaocaoController extends BaseController
         // Dữ liệu biểu đồ theo ngày
         $chartByDateData = $this->ModelBaocao->getChartDataByDate($fromDate, $toDate, $maLichKhoiHanh);
 
-        $this->renderView('pages/baocao/baocao.php', [
+        $this->renderView('pages/admin/baocao/baocao.php', [
             'Baocao'          => $Baocao,
             'summary'         => $summary,
             'chartData'       => $chartData,
@@ -80,14 +80,14 @@ class BaocaoController extends BaseController
                 exit;
             }
 
-            $this->renderView('pages/baocao/add.php', [
+            $this->renderView('pages/admin/baocao/add.php', [
 'pageTitle' => 'Thêm mới Báo cáo',
                 'error'     => 'Thêm báo cáo thất bại. Vui lòng thử lại.'
             ]);
             return;
         }
 
-        $this->renderView('pages/baocao/add.php', [
+        $this->renderView('pages/admin/baocao/add.php', [
             'pageTitle' => 'Thêm mới Báo cáo'
         ]);
     }
@@ -114,7 +114,7 @@ class BaocaoController extends BaseController
             $id     = (int)$_GET['id'];
             $Baocao = $this->ModelBaocao->getBaocaoById($id);
 
-            $this->renderView('pages/baocao/edit.php', [
+            $this->renderView('pages/admin/baocao/edit.php', [
                 'Baocao'    => $Baocao,
                 'pageTitle' => 'Cập nhật Báo cáo'
             ]);
@@ -176,7 +176,7 @@ class BaocaoController extends BaseController
             exit;
         }
 
-        $this->renderView('pages/baocao/baocao_detail.php', [
+        $this->renderView('pages/admin/baocao/baocao_detail.php', [
             'Baocao'    => $Baocao,
 'pageTitle' => 'Chi tiết Báo cáo tài chính'
         ]);

@@ -11,7 +11,7 @@ class BookingController extends BaseController
     public function index()
     {
         $bookingList = $this->bookingModel->getAll();
-        $this->renderView('pages/booking/list.php', [
+        $this->renderView('pages/admin/booking/list.php', [
             'bookingList' => $bookingList
         ]);
     }
@@ -22,7 +22,7 @@ class BookingController extends BaseController
         // Lấy danh sách lịch trình để đổ vào dropdown
         $listLich = $this->bookingModel->getAvailableSchedules();
 
-        $this->renderView('pages/booking/add.php', [
+        $this->renderView('pages/admin/booking/add.php', [
             'listLich' => $listLich
         ]);
     }
@@ -98,7 +98,7 @@ class BookingController extends BaseController
             exit();
         }
 
-        $this->renderView('pages/booking/detail.php', ['booking' => $booking]);
+        $this->renderView('pages/admin/booking/detail.php', ['booking' => $booking]);
     }
 
     // 6. Hiển thị form sửa (đổi trạng thái)
@@ -115,7 +115,7 @@ class BookingController extends BaseController
             ['MaTrangThai' => 3, 'TenTrangThai' => 'Đã hủy']
         ];
 
-        $this->renderView('pages/booking/edit.php', [
+        $this->renderView('pages/admin/booking/edit.php', [
             'booking' => $booking,
             'listTrangThai' => $listTrangThai
         ]);

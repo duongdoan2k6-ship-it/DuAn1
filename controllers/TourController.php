@@ -11,7 +11,7 @@ class TourController extends BaseController
             'tours' => $allTours,
             'pageTitle' => 'Quản lý Danh sách Tour'
         ];
-        $this->renderView('pages/tours/list_tour.php', $data);
+        $this->renderView('pages/admin/tours/list_tour.php', $data);
     }
 
     public function add()
@@ -145,14 +145,8 @@ class TourController extends BaseController
             'pageTitle'     => 'Thêm Tour Mới'
         ];
 
-        $this->renderView('pages/tours/add_tour.php', $data);
+        $this->renderView('pages/admin/tours/add_tour.php', $data);
     }
-
-
-
-
-
-
 
     public function edit()
     {
@@ -311,7 +305,7 @@ class TourController extends BaseController
             'pageTitle'     => 'Chỉnh sửa Tour'
         ];
 
-        $this->renderView('pages/tours/edit_tour.php', $data);
+        $this->renderView('pages/admin/tours/edit_tour.php', $data);
     }
 
     public function detail()
@@ -330,6 +324,6 @@ class TourController extends BaseController
             'tour' => $tourDetail,
         ];
 
-        $this->renderView('pages/tours/detail_tour.php', $data);
+        $this->renderView('pages/admin/tours/detail_tour.php', $data);
     }
 }
