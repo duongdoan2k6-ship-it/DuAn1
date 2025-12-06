@@ -38,15 +38,6 @@
             <!-- ADMIN -->
             <span class="ms-1 text-white">Admin</span>
             <ul class="navbar-nav">
-
-                <!-- Trang chủ -->
-                <li class="nav-item">
-                    <a class="nav-link text-white active bg-gradient-primary"
-                        href="<?php echo base_url('public/'); ?>">
-                        <span class="nav-link-text ms-1">Trang chủ</span>
-                    </a>
-                </li>
-
                 <!-- Quản lý Tour -->
                 <li class="nav-item">
                     <a class="nav-link text-white active bg-gradient-primary"
@@ -87,7 +78,7 @@
                     </a>
                 </li>
             </ul>
-            
+
             <hr class="horizontal light mt-0 mb-2">
 
             <!-- HƯỚNG DẪN VIÊN -->
