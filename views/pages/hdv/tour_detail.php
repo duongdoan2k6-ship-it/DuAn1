@@ -154,8 +154,8 @@
                                     <div class="timeline-item pb-4">
                                         <h6 class="timeline-day">Ngày <?= $item['ngay_thu'] ?></h6>
                                         <h5 class="mt-2 text-dark fw-bold"><?= $item['tieu_de'] ?></h5>
-                                        <p class="text-muted small mb-1"><i class="bi bi-clock"></i> <?= $item['thoi_gian'] ?: 'Cả ngày' ?></p>
-                                        <div class="text-break"><?= nl2br(htmlspecialchars($item['noi_dung_chi_tiet'])) ?></div>
+                                        <p class="text-muted small mb-1"><i class="bi bi-clock"></i> <?= $item['thoi_gian'] ?? 'Cả ngày' ?></p>
+                                        <div class="text-break"><?= nl2br(htmlspecialchars($item['noi_dung'])) ?></div>
                                     </div>
                                 <?php endforeach; ?>
                             </div>
@@ -193,7 +193,7 @@
 
                                                 <td class="bg-light">
                                                     <div class="d-flex justify-content-between align-items-start">
-                                                        <span class="text-secondary small me-2" id="note-<?= $p['khach_id'] ?>">
+                                                        <span class="text-secondary small me-2" id="note-<?= $p['id_khach'] ?>">
                                                             <?php if (!empty($p['ghi_chu_dac_biet'])): ?>
                                                                 <i class="bi bi-exclamation-circle-fill text-warning"></i> <?= htmlspecialchars($p['ghi_chu_dac_biet']) ?>
                                                             <?php else: ?>
@@ -203,7 +203,7 @@
                                                         <button type="button" class="btn btn-sm btn-outline-info border-0"
                                                             data-bs-toggle="modal"
                                                             data-bs-target="#editNoteModal"
-                                                            data-khach-id="<?= $p['khach_id'] ?>"
+                                                            data-khach-id="<?= $p['id_khach'] ?>"
                                                             data-khach-ten="<?= htmlspecialchars($p['ho_ten_khach']) ?>"
                                                             data-ghi-chu="<?= htmlspecialchars($p['ghi_chu_dac_biet'] ?? '') ?>"
                                                             title="Chỉnh sửa yêu cầu">
