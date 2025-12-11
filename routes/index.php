@@ -84,6 +84,12 @@ match ($action) {
     // Thống kê doanh thu
     'admin-statistics' => (new StatisticalController)->index(),
 
+    // Các route cho chức năng Điểm danh theo phiên
+    'hdv-create-phien-dd' => (new HdvController)->createPhienDiemDanh(), 
+    'hdv-view-diem-danh'  => (new HdvController)->viewDiemDanh(),
+    'hdv-save-diem-danh'  => (new HdvController)->saveDiemDanh(),
+    'hdv-delete-phien-dd' => (new HdvController)->deletePhienDiemDanh(),
+
     default             => (new AuthController)->showLoginForm(),
 };
 ?>

@@ -103,6 +103,11 @@
                             <i class="bi bi-journal-text"></i> <strong>Nhật ký Tour</strong>
                         </button>
                     </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="attendance-tab" data-bs-toggle="tab" data-bs-target="#attendance-tab-pane" type="button" role="tab">
+                            <i class="bi bi-clipboard-check-fill"></i> <strong>Điểm danh đoàn</strong>
+                        </button>
+                    </li>
                 </ul>
             </div>
             <div class="card-body">
@@ -299,6 +304,43 @@
                                 <?php endif; ?>
                             </div>
                         </div>
+                    </div>
+
+                    <div class="tab-pane fade" id="attendance-tab-pane" role="tabpanel" tabindex="0">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="text-primary m-0">Danh sách các đợt điểm danh</h5>
+                            <form action="<?= BASE_URL ?>routes/index.php?action=hdv-create-phien-dd" method="POST" class="d-flex">
+                                <input type="hidden" name="lich_khoi_hanh_id" value="<?= $lichId ?>">
+                                <input type="text" name="tieu_de" class="form-control me-2" placeholder="VD: Tập trung ăn trưa..." required>
+                                <button type="submit" class="btn btn-success text-nowrap"><i class="bi bi-plus-lg"></i> Tạo phiên mới</button>
+                            </form>
+                        </div>
+
+                        <?php if (empty($phienDiemDanhList)): ?>
+                            <div class="alert alert-warning text-center">Chưa có phiên điểm danh nào. Hãy tạo phiên đầu tiên!</div>
+                        <?php else: ?>
+                            <div class="list-group">
+                                <?php foreach ($phienDiemDanhList as $phien): ?>
+                                    <div class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="mb-1 fw-bold"><?= htmlspecialchars($phien['tieu_de']) ?></h6>
+                                            <small class="text-muted"><i class="bi bi-clock"></i> <?= date('H:i d/m/Y', strtotime($phien['thoi_gian_tao'])) ?></small>
+                                        </div>
+                                        <div>
+                                            <a href="<?= BASE_URL ?>routes/index.php?action=hdv-view-diem-danh&lich_id=<?= $lichId ?>&phien_id=<?= $phien['id'] ?>"
+                                                class="btn btn-sm btn-primary">
+                                                <i class="bi bi-eye"></i> Chi tiết & Điểm danh
+                                            </a>
+                                            <a href="<?= BASE_URL ?>routes/index.php?action=hdv-delete-phien-dd&lich_id=<?= $lichId ?>&phien_id=<?= $phien['id'] ?>"
+                                                class="btn btn-sm btn-outline-danger ms-1"
+                                                onclick="return confirm('Xóa phiên điểm danh này? Dữ liệu chi tiết sẽ mất!');">
+                                                <i class="bi bi-trash"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                <?php endforeach; ?>
+                            </div>
+                        <?php endif; ?>
                     </div>
 
                 </div>

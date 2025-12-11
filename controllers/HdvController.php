@@ -1,12 +1,13 @@
 <?php
 class HdvController extends BaseController
 {
-
     private $nhatKyModel;
+    private $diemDanhModel;
 
     public function __construct()
     {
         $this->nhatKyModel = new NhatKyTourModel();
+        $this->diemDanhModel = new DiemDanhModel();
     }
 
     // Trang danh sách tour (Dashboard)
@@ -24,7 +25,7 @@ class HdvController extends BaseController
         $this->render('pages/hdv/dashboard', ['myTours' => $myTours]);
     }
 
-    // Xem chi tiết tour, danh sách khách và nhật ký
+    // Xem chi tiết tour: Khách, Lịch trình, Nhật ký, Phiên điểm danh
     public function detail()
     {
         if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'hdv') {
@@ -49,20 +50,24 @@ class HdvController extends BaseController
         // 3. Lấy lịch trình chi tiết (dự kiến)
         $itineraries = $lichModel->getTourItinerary($tourInfo['tour_id']);
 
-        // 4. [MỚI] Lấy danh sách nhật ký tour (thực tế)
+        // 4. Lấy danh sách nhật ký tour (thực tế)
         $nhatKyList = $this->nhatKyModel->getLogsByLichId($lichId);
+
+        // 5. [MỚI] Lấy danh sách các phiên điểm danh
+        $phienDiemDanhList = $this->diemDanhModel->getPhienByLich($lichId);
 
         // Truyền tất cả sang view
         $this->render('pages/hdv/tour_detail', [
-            'tourInfo'   => $tourInfo,
-            'passengers' => $passengers,
-            'itineraries' => $itineraries,
-            'nhatKyList' => $nhatKyList, // Truyền biến này sang view
-            'lichId'     => $lichId
+            'tourInfo'          => $tourInfo,
+            'passengers'        => $passengers,
+            'itineraries'       => $itineraries,
+            'nhatKyList'        => $nhatKyList,
+            'phienDiemDanhList' => $phienDiemDanhList, // Truyền biến này sang view
+            'lichId'            => $lichId
         ]);
     }
 
-    // Xử lý lưu điểm danh
+    // Xử lý lưu điểm danh nhanh (Logic cũ - Giữ lại để tương thích)
     public function checkIn()
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -70,7 +75,6 @@ class HdvController extends BaseController
             $attendanceData = $_POST['attendance'] ?? [];
 
             $khachModel = new KhachTourModel();
-
             $khachModel->resetStatus($lichId);
 
             foreach ($attendanceData as $idKhach => $value) {
@@ -81,13 +85,16 @@ class HdvController extends BaseController
         }
     }
 
-    // [MỚI] Xử lý thêm nhật ký tour
+    // ====================================================================
+    // CÁC HÀM XỬ LÝ NHẬT KÝ
+    // ====================================================================
+
+    // Xử lý thêm nhật ký tour
     public function addNhatKy()
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $lichId = $_POST['lich_khoi_hanh_id'];
 
-            // Lấy dữ liệu từ form
             $data = [
                 'lich_khoi_hanh_id' => $lichId,
                 'tieu_de'           => $_POST['tieu_de'] ?? '',
@@ -99,11 +106,7 @@ class HdvController extends BaseController
 
             // Xử lý upload ảnh
             if (isset($_FILES['hinh_anh']) && $_FILES['hinh_anh']['error'] == 0) {
-                // Đường dẫn lưu file (tính từ file index.php trong thư mục routes)
-                // Cần đi ra khỏi routes (../) vào public/assets/uploads/nhat_ky/
                 $uploadDir = '../public/assets/uploads/nhat_ky/';
-
-                // Tạo thư mục nếu chưa tồn tại
                 if (!file_exists($uploadDir)) {
                     mkdir($uploadDir, 0777, true);
                 }
@@ -112,25 +115,22 @@ class HdvController extends BaseController
                 $targetFile = $uploadDir . $fileName;
 
                 if (move_uploaded_file($_FILES['hinh_anh']['tmp_name'], $targetFile)) {
-                    // Lưu đường dẫn vào DB (lưu đường dẫn tương đối để dễ hiển thị)
-                    // Vì khi hiển thị sẽ từ public/index.php hoặc routes, ta nên lưu từ assets...
                     $data['hinh_anh'] = 'assets/uploads/nhat_ky/' . $fileName;
                 }
             }
 
-            // Gọi model để lưu
             if ($this->nhatKyModel->addNhatKy($data)) {
                 $status = 'log_success';
             } else {
                 $status = 'log_error';
             }
 
-            // Quay lại trang chi tiết
             header('Location: ' . BASE_URL . 'routes/index.php?action=hdv-tour-detail&id=' . $lichId . '&status=' . $status);
             exit;
         }
     }
-    // --- [MỚI] Hiển thị form sửa nhật ký ---
+
+    // Hiển thị form sửa nhật ký
     public function editNhatKy()
     {
         if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'hdv') {
@@ -144,11 +144,10 @@ class HdvController extends BaseController
             die('Nhật ký không tồn tại');
         }
 
-        // Gọi view sửa (chúng ta sẽ tạo file này ở Bước 4)
         $this->render('pages/hdv/edit_nhat_ky', ['log' => $log]);
     }
 
-    // --- [MỚI] Xử lý cập nhật nhật ký ---
+    // Xử lý cập nhật nhật ký
     public function updateNhatKy()
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -160,10 +159,9 @@ class HdvController extends BaseController
                 'noi_dung'          => $_POST['noi_dung'] ?? '',
                 'su_co'             => $_POST['su_co'] ?? '',
                 'phan_hoi_khach'    => $_POST['phan_hoi_khach'] ?? '',
-                'hinh_anh'          => '' // Mặc định rỗng
+                'hinh_anh'          => ''
             ];
 
-            // Xử lý upload ảnh mới (nếu có)
             if (isset($_FILES['hinh_anh']) && $_FILES['hinh_anh']['error'] == 0) {
                 $uploadDir = '../public/assets/uploads/nhat_ky/';
                 if (!file_exists($uploadDir)) mkdir($uploadDir, 0777, true);
@@ -174,7 +172,6 @@ class HdvController extends BaseController
                 if (move_uploaded_file($_FILES['hinh_anh']['tmp_name'], $targetFile)) {
                     $data['hinh_anh'] = 'assets/uploads/nhat_ky/' . $fileName;
 
-                    // (Tùy chọn) Xóa ảnh cũ để tiết kiệm dung lượng
                     $oldLog = $this->nhatKyModel->getLogById($id);
                     if ($oldLog && !empty($oldLog['hinh_anh'])) {
                         $oldPath = '../public/' . $oldLog['hinh_anh'];
@@ -189,27 +186,120 @@ class HdvController extends BaseController
         }
     }
 
-    // --- [MỚI] Xử lý xóa nhật ký ---
+    // Xử lý xóa nhật ký
     public function deleteNhatKy()
     {
         $id = $_GET['id'] ?? 0;
         $lichId = $_GET['lich_id'] ?? 0;
 
-        // Lấy thông tin để xóa ảnh
         $log = $this->nhatKyModel->getLogById($id);
 
         if ($log) {
-            // Xóa file ảnh nếu có
             if (!empty($log['hinh_anh'])) {
                 $filePath = '../public/' . $log['hinh_anh'];
                 if (file_exists($filePath)) unlink($filePath);
             }
-
-            // Xóa trong DB
             $this->nhatKyModel->deleteNhatKy($id);
         }
 
         header('Location: ' . BASE_URL . 'routes/index.php?action=hdv-tour-detail&id=' . $lichId . '&status=delete_success');
         exit;
     }
+
+    // ====================================================================
+    // CÁC HÀM XỬ LÝ ĐIỂM DANH CHI TIẾT (MỚI)
+    // ====================================================================
+
+    // 1. Tạo Phiên điểm danh mới
+    public function createPhienDiemDanh()
+    {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $lichId = $_POST['lich_khoi_hanh_id'];
+            $tieuDe = trim($_POST['tieu_de'] ?? '');
+
+            if (empty($tieuDe)) {
+                $status = 'phien_error';
+            } else {
+                $newId = $this->diemDanhModel->createPhien($lichId, $tieuDe);
+                if ($newId) {
+                    header('Location: ' . BASE_URL . 'routes/index.php?action=hdv-view-diem-danh&lich_id=' . $lichId . '&phien_id=' . $newId . '&status=phien_created');
+                    exit;
+                } else {
+                    $status = 'phien_error';
+                }
+            }
+            header('Location: ' . BASE_URL . 'routes/index.php?action=hdv-tour-detail&id=' . $lichId . '&status=' . $status);
+            exit;
+        }
+    }
+
+    // 2. Xem chi tiết 1 phiên điểm danh (và hiển thị form điểm danh)
+    public function viewDiemDanh()
+    {
+        if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'hdv') {
+            header('Location: ' . BASE_URL . 'routes/index.php?action=login');
+            exit;
+        }
+
+        $lichId = $_GET['lich_id'] ?? 0;
+        $phienId = $_GET['phien_id'] ?? 0;
+
+        if ($lichId == 0 || $phienId == 0) {
+            die("Thiếu thông tin chuyến đi hoặc phiên điểm danh.");
+        }
+
+        // Lấy danh sách khách và trạng thái điểm danh chi tiết
+        $passengers = $this->diemDanhModel->getChiTietPhien($phienId, $lichId);
+
+        
+        $phienInfo = $this->diemDanhModel->getPhienById($phienId);
+
+        $lichModel = new LichKhoiHanhModel();
+        $tourInfo = $lichModel->getDetailForHdv($lichId);
+
+        $this->render('pages/hdv/diem_danh_detail', [
+            'tourInfo'   => $tourInfo,
+            'phienInfo'  => $phienInfo,
+            'passengers' => $passengers,
+            'lichId'     => $lichId,
+            'phienId'    => $phienId
+        ]);
+    }
+
+    // 3. Xử lý lưu trạng thái điểm danh chi tiết
+    public function saveDiemDanh()
+    {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $lichId = $_POST['lich_id'];
+            $phienId = $_POST['phien_id'];
+            $attendanceData = $_POST['attendance'] ?? []; // Mảng: khach_id => [status, note]
+
+            $success = true;
+            foreach ($attendanceData as $khachId => $data) {
+                $trangThai = $data['status'] ?? 0;
+                $ghiChu = $data['note'] ?? null;
+
+                if (!$this->diemDanhModel->saveChiTiet($phienId, $khachId, $trangThai, $ghiChu)) {
+                    $success = false;
+                }
+            }
+
+            $status = $success ? 'dd_saved' : 'dd_error';
+            header('Location: ' . BASE_URL . 'routes/index.php?action=hdv-view-diem-danh&lich_id=' . $lichId . '&phien_id=' . $phienId . '&status=' . $status);
+            exit;
+        }
+    }
+
+    // 4. Xóa phiên điểm danh
+    public function deletePhienDiemDanh()
+    {
+        $phienId = $_GET['phien_id'] ?? 0;
+        $lichId = $_GET['lich_id'] ?? 0;
+
+        $this->diemDanhModel->deletePhien($phienId);
+
+        header('Location: ' . BASE_URL . 'routes/index.php?action=hdv-tour-detail&id=' . $lichId . '&status=phien_deleted');
+        exit;
+    }
 }
+?>
