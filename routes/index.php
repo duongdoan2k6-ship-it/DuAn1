@@ -22,6 +22,10 @@ match ($action) {
     // Các route con khác của HDV 
     'hdv-tour-detail'   => (new HdvController)->detail(),
     'hdv-check-in'      => (new HdvController)->checkIn(),
+    'hdv-add-nhat-ky'   => (new HdvController)->addNhatKy(),
+    'hdv-edit-nhat-ky'   => (new HdvController)->editNhatKy(),
+    'hdv-update-nhat-ky' => (new HdvController)->updateNhatKy(),
+    'hdv-delete-nhat-ky' => (new HdvController)->deleteNhatKy(),
 
     // 
     'admin-create-lich' => (new DashboardController)->create(),
