@@ -33,7 +33,6 @@
             color: #28a745;
         }
 
-        /* Style cho ảnh nhật ký */
         .log-image {
             max-width: 150px;
             height: auto;
@@ -59,26 +58,35 @@
 
     <div class="container">
 
-        <?php if (isset($_GET['status']) && $_GET['status'] == 'success'): ?>
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                <i class="bi bi-check-circle-fill"></i> Đã lưu trạng thái điểm danh thành công!
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
+        <?php if (isset($_GET['status'])): ?>
+            <?php if ($_GET['status'] == 'success'): ?>
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="bi bi-check-circle-fill"></i> Đã lưu trạng thái điểm danh thành công!
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            <?php elseif ($_GET['status'] == 'log_success'): ?>
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="bi bi-journal-check"></i> Đã thêm nhật ký thành công!
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            <?php elseif ($_GET['status'] == 'log_error'): ?>
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="bi bi-exclamation-triangle"></i> Có lỗi xảy ra khi thêm nhật ký.
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            <?php elseif ($_GET['status'] == 'phien_deleted'): ?>
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="bi bi-trash"></i> Đã xóa phiên điểm danh thành công.
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            <?php elseif ($_GET['status'] == 'note_success'): ?>
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="bi bi-save"></i> Cập nhật yêu cầu đặc biệt thành công!
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            <?php endif; ?>
         <?php endif; ?>
 
-        <?php if (isset($_GET['status']) && $_GET['status'] == 'log_success'): ?>
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                <i class="bi bi-journal-check"></i> Đã thêm nhật ký thành công!
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        <?php endif; ?>
-
-        <?php if (isset($_GET['status']) && $_GET['status'] == 'log_error'): ?>
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                <i class="bi bi-exclamation-triangle"></i> Có lỗi xảy ra khi thêm nhật ký. Vui lòng thử lại!
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        <?php endif; ?>
 
         <div class="card shadow">
             <div class="card-header p-0 pt-1 border-bottom-0">
@@ -155,55 +163,68 @@
                     </div>
 
                     <div class="tab-pane fade" id="passenger-tab-pane" role="tabpanel" tabindex="0">
-                        <form action="<?= BASE_URL ?>routes/index.php?action=hdv-check-in" method="POST">
-                            <input type="hidden" name="lich_id" value="<?= $lichId ?>">
-
-                            <div class="table-responsive">
-                                <table class="table table-hover align-middle">
-                                    <thead class="table-light">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle table-bordered">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th style="width: 5%;">STT</th>
+                                        <th style="width: 20%;">Họ Tên Khách</th>
+                                        <th style="width: 15%;">Thông Tin / SĐT</th>
+                                        <th style="width: 30%;">Yêu Cầu Đặc Biệt</th> <th style="width: 15%;">Trạng thái</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php if (empty($passengers)): ?>
                                         <tr>
-                                            <th>Họ Tên Khách</th>
-                                            <th>Thông Tin</th>
-                                            <th>Trưởng Đoàn</th>
-                                            <th class="text-center">Điểm Danh</th>
+                                            <td colspan="5" class="text-center py-4">Chưa có khách nào đặt tour này.</td>
                                         </tr>
-                                    </thead>
-                                    <tbody>
-                                        <?php if (empty($passengers)): ?>
+                                    <?php else: ?>
+                                        <?php foreach ($passengers as $index => $p): ?>
                                             <tr>
-                                                <td colspan="4" class="text-center py-4">Chưa có khách nào đặt tour này.</td>
+                                                <td class="text-center"><?= $index + 1 ?></td>
+                                                <td>
+                                                    <strong><?= $p['ho_ten_khach'] ?></strong><br>
+                                                    <small class="text-muted"><?= $p['gioi_tinh'] ?> - <?= $p['loai_khach'] ?></small>
+                                                </td>
+                                                <td>
+                                                    <i class="bi bi-telephone"></i> <strong><?= $p['sdt_lien_he'] ?></strong><br>
+                                                    <small class="text-muted">Người đặt: <?= $p['ten_nguoi_dat'] ?></small>
+                                                </td>
+
+                                                <td class="bg-light">
+                                                    <div class="d-flex justify-content-between align-items-start">
+                                                        <span class="text-secondary small me-2" id="note-<?= $p['khach_id'] ?>">
+                                                            <?php if (!empty($p['ghi_chu_dac_biet'])): ?>
+                                                                <i class="bi bi-exclamation-circle-fill text-warning"></i> <?= htmlspecialchars($p['ghi_chu_dac_biet']) ?>
+                                                            <?php else: ?>
+                                                                <em class="text-muted">Chưa có ghi chú</em>
+                                                            <?php endif; ?>
+                                                        </span>
+                                                        <button type="button" class="btn btn-sm btn-outline-info border-0"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#editNoteModal"
+                                                            data-khach-id="<?= $p['khach_id'] ?>"
+                                                            data-khach-ten="<?= htmlspecialchars($p['ho_ten_khach']) ?>"
+                                                            data-ghi-chu="<?= htmlspecialchars($p['ghi_chu_dac_biet'] ?? '') ?>"
+                                                            title="Chỉnh sửa yêu cầu">
+                                                            <i class="bi bi-pencil-square fs-6"></i>
+                                                        </button>
+                                                    </div>
+                                                </td>
+
+                                                <td class="text-center">
+                                                    <?php if ($p['trang_thai_diem_danh'] == 1): ?>
+                                                        <span class="badge bg-success">Đã tham gia</span>
+                                                    <?php else: ?>
+                                                        <span class="badge bg-secondary">Chưa xác nhận</span>
+                                                    <?php endif; ?>
+                                                </td>
                                             </tr>
-                                        <?php else: ?>
-                                            <?php foreach ($passengers as $p): ?>
-                                                <tr class="<?= $p['trang_thai_diem_danh'] ? 'table-success' : '' ?>">
-                                                    <td><strong><?= $p['ho_ten_khach'] ?></strong></td>
-                                                    <td>
-                                                        <span class="badge bg-secondary"><?= $p['gioi_tinh'] ?></span>
-                                                        <span class="badge bg-info text-dark"><?= $p['loai_khach'] ?></span>
-                                                    </td>
-                                                    <td>
-                                                        <small class="text-muted">Đặt bởi:</small> <?= $p['ten_nguoi_dat'] ?><br>
-                                                        <small class="text-muted">SĐT:</small> <strong><?= $p['sdt_lien_he'] ?></strong>
-                                                    </td>
-                                                    <td class="text-center">
-                                                        <div class="form-check d-flex justify-content-center">
-                                                            <input class="form-check-input" type="checkbox"
-                                                                name="attendance[<?= $p['id_khach'] ?>]"
-                                                                value="1"
-                                                                style="transform: scale(1.5);"
-                                                                <?= $p['trang_thai_diem_danh'] == 1 ? 'checked' : '' ?>>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                            <?php endforeach; ?>
-                                        <?php endif; ?>
-                                    </tbody>
-                                </table>
-                            </div>
-                            <div class="d-flex justify-content-end mt-4">
-                                <button type="submit" class="btn btn-success px-4 fw-bold">LƯU ĐIỂM DANH</button>
-                            </div>
-                        </form>
+                                        <?php endforeach; ?>
+                                    <?php endif; ?>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
 
                     <div class="tab-pane fade" id="diary-tab-pane" role="tabpanel" tabindex="0">
@@ -219,7 +240,7 @@
 
                                             <div class="mb-3">
                                                 <label class="form-label fw-bold">Tiêu đề (Ngày/Sự kiện) <span class="text-danger">*</span></label>
-                                                <input type="text" class="form-control" name="tieu_de" placeholder="VD: Ngày 1 - làm gì" required>
+                                                <input type="text" class="form-control" name="tieu_de" placeholder="VD: Ngày 1 - Đón khách tại sân bay" required>
                                             </div>
 
                                             <div class="mb-3">
@@ -261,15 +282,12 @@
                                                 <div class="card-body">
                                                     <div class="d-flex justify-content-between align-items-center mb-2">
                                                         <h5 class="card-title text-primary m-0"><?= htmlspecialchars($log['tieu_de']) ?></h5>
-
                                                         <div>
                                                             <small class="text-muted me-2"><?= date('H:i d/m/Y', strtotime($log['thoi_gian_tao'])) ?></small>
-
                                                             <a href="<?= BASE_URL ?>routes/index.php?action=hdv-edit-nhat-ky&id=<?= $log['id'] ?>"
                                                                 class="btn btn-sm btn-outline-warning" title="Sửa">
                                                                 <i class="bi bi-pencil-square"></i>
                                                             </a>
-
                                                             <a href="<?= BASE_URL ?>routes/index.php?action=hdv-delete-nhat-ky&id=<?= $log['id'] ?>&lich_id=<?= $lichId ?>"
                                                                 class="btn btn-sm btn-outline-danger"
                                                                 onclick="return confirm('Bạn có chắc chắn muốn xóa nhật ký này?');" title="Xóa">
@@ -348,7 +366,64 @@
         </div>
     </div>
 
+    <div class="modal fade" id="editNoteModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-info text-white">
+                    <h5 class="modal-title"><i class="bi bi-person-fill"></i> Yêu Cầu Đặc Biệt của Khách</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form action="<?= BASE_URL ?>routes/index.php?action=hdv-update-khach-note" method="POST">
+                    <div class="modal-body">
+                        <input type="hidden" name="lich_id" value="<?= $lichId ?>">
+                        <input type="hidden" name="khach_id" id="modal-khach-id">
+
+                        <p>Cập nhật yêu cầu cho khách: <strong id="modal-khach-ten" class="text-primary"></strong></p>
+
+                        <div class="form-group">
+                            <label for="modal-ghi-chu" class="fw-bold mb-2">Nội dung yêu cầu:</label>
+                            <textarea class="form-control" name="ghi_chu" id="modal-ghi-chu" rows="4"
+                                placeholder="Ví dụ: Ăn chay, dị ứng hải sản, cần hỗ trợ y tế,..."></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                        <button type="submit" class="btn btn-info fw-bold"><i class="bi bi-save"></i> Lưu Yêu Cầu</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+
+            var editNoteModal = document.getElementById('editNoteModal');
+            if (editNoteModal) {
+                editNoteModal.addEventListener('show.bs.modal', function(event) {
+                    var button = event.relatedTarget;
+                    var khachId = button.getAttribute('data-khach-id');
+                    var khachTen = button.getAttribute('data-khach-ten');
+                    var ghiChu = button.getAttribute('data-ghi-chu');
+
+                    editNoteModal.querySelector('#modal-khach-id').value = khachId;
+                    editNoteModal.querySelector('#modal-khach-ten').textContent = khachTen;
+                    editNoteModal.querySelector('#modal-ghi-chu').value = ghiChu;
+                });
+            }
+
+            var hash = window.location.hash;
+            if (hash) {
+                if (hash === '#v-pills-passengers-tab') {
+                    var triggerEl = document.querySelector('#myTab button[data-bs-target="#passenger-tab-pane"]');
+                    if (triggerEl) {
+                        bootstrap.Tab.getInstance(triggerEl) || new bootstrap.Tab(triggerEl).show();
+                    }
+                }
+            }
+        });
+    </script>
 </body>
 
 </html>

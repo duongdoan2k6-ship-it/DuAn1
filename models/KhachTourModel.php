@@ -38,5 +38,21 @@ class KhachTourModel extends BaseModel {
         $stmt = $this->conn->prepare($sql);
         $stmt->execute(['lich_id' => $lichId]);
     }
+
+    /**
+     * Cập nhật ghi chú đặc biệt cho một khách cụ thể
+     * @param int $khachId ID của khách trong bảng khach_tour
+     * @param string $ghiChu Nội dung ghi chú mới
+     * @return bool
+     */
+    public function updateGhiChuDacBiet($khachId, $ghiChu)
+    {
+        $sql = "UPDATE khach_tour SET ghi_chu_dac_biet = :ghi_chu WHERE id = :id";
+        $stmt = $this->conn->prepare($sql);
+        return $stmt->execute([
+            'ghi_chu' => $ghiChu,
+            'id' => $khachId
+        ]);
+    }
 }
 ?>

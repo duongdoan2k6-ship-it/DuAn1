@@ -301,5 +301,37 @@ class HdvController extends BaseController
         header('Location: ' . BASE_URL . 'routes/index.php?action=hdv-tour-detail&id=' . $lichId . '&status=phien_deleted');
         exit;
     }
+
+    // ====================================================================
+    // CÁC HÀM XỬ LÝ NHU CẦU ĐẶC BIỆT CỦA KHÁCH (MỚI)
+    // ====================================================================
+
+    // [MỚI] Xử lý cập nhật yêu cầu đặc biệt của khách
+    public function updateYeuCauDacBiet()
+    {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $lichId = $_POST['lich_id'] ?? 0;
+            $khachId = $_POST['khach_id'] ?? 0;
+            $ghiChu = trim($_POST['ghi_chu'] ?? ''); // Lấy nội dung ghi chú
+
+            if ($khachId == 0 || $lichId == 0) {
+                // Xử lý lỗi thiếu tham số
+                header('Location: ' . BASE_URL . 'routes/index.php?action=hdv-tour-detail&id=' . $lichId . '&status=note_error_param');
+                exit;
+            }
+
+            $khachModel = new KhachTourModel();
+            if ($khachModel->updateGhiChuDacBiet($khachId, $ghiChu)) {
+                $status = 'note_success';
+            } else {
+                $status = 'note_error';
+            }
+
+            // Quay lại tab Khách hàng của trang chi tiết tour
+            // Thêm hash #v-pills-passengers-tab để tự động mở tab Khách hàng
+            header('Location: ' . BASE_URL . 'routes/index.php?action=hdv-tour-detail&id=' . $lichId . '&status=' . $status . '#v-pills-passengers-tab');
+            exit;
+        }
+    }
 }
 ?>

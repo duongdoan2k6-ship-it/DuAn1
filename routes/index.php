@@ -90,6 +90,9 @@ match ($action) {
     'hdv-save-diem-danh'  => (new HdvController)->saveDiemDanh(),
     'hdv-delete-phien-dd' => (new HdvController)->deletePhienDiemDanh(),
 
+    // [MỚI THÊM] Route cho chức năng Cập nhật Ghi chú Đặc biệt
+    'hdv-update-khach-note' => (new HdvController)->updateYeuCauDacBiet(),
+
     default             => (new AuthController)->showLoginForm(),
 };
 ?>
