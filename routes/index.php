@@ -93,6 +93,8 @@ match ($action) {
     // [MỚI THÊM] Route cho chức năng Cập nhật Ghi chú Đặc biệt
     'hdv-update-khach-note' => (new HdvController)->updateYeuCauDacBiet(),
 
+    'admin-tour-delete-image' => (new TourController)->deleteGalleryImage(),
+
     default             => (new AuthController)->showLoginForm(),
 };
 ?>
