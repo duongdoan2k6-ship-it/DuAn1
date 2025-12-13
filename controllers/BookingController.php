@@ -70,6 +70,7 @@ class BookingController extends BaseController {
     }
 
     // [NÂNG CẤP] Xử lý lưu booking kèm danh sách thành viên
+    // [NÂNG CẤP] Xử lý lưu booking kèm danh sách thành viên
     public function store() {
         if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') exit;
 
@@ -90,32 +91,44 @@ class BookingController extends BaseController {
             'email_lien_he'     => $_POST['email_lien_he'],
             'so_nguoi_lon'      => $soLon,
             'so_tre_em'         => $soTre,
-            'tong_tien'         => $_POST['tong_tien'], // Lấy từ input Admin nhập
+            'tong_tien'         => $_POST['tong_tien'],
             'ghi_chu'           => $_POST['ghi_chu'] ?? '',
-            'trang_thai'        => 'DaXacNhan' // Admin tạo thì mặc định xác nhận luôn
+            'trang_thai'        => 'DaXacNhan' 
         ];
 
         // 2. Khởi tạo Models
-        $lkhModel = new LichKhoiHanhModel();
         $bookingModel = new BookingModel();
-        $khachTourModel = new KhachTourModel(); 
+        
+        // --- [QUAN TRỌNG: FIX LỖI TRANSACTION] ---
+        // Khởi tạo các model khác nhưng GÁN KẾT NỐI của bookingModel sang
+        // Điều này đảm bảo tất cả chạy trên cùng 1 Transaction
+        $lkhModel = new LichKhoiHanhModel();
+        $khachTourModel = new KhachTourModel();
+        
+        // Kiểm tra xem BaseModel có cho phép truy cập $conn không (thường là protected hoặc public)
+        // Nếu $conn là public trong BaseModel thì dòng dưới hoạt động tốt.
+        // Nếu $conn là protected, bạn cần sửa BaseModel thành public $conn;
+        if (property_exists($bookingModel, 'conn')) {
+            $lkhModel->conn = $bookingModel->conn;
+            $khachTourModel->conn = $bookingModel->conn;
+        }
+        // ------------------------------------------
 
         try {
             // Bắt đầu Transaction
             $bookingModel->conn->beginTransaction();
 
-            // A. Kiểm tra chỗ trống (Gọi hàm checkAvailability vừa thêm ở LichKhoiHanhModel)
+            // A. Kiểm tra chỗ trống
             if (!$lkhModel->checkAvailability($lichId, $tongKhach)) {
                 throw new Exception("Lịch khởi hành này không còn đủ chỗ trống cho $tongKhach người!");
             }
 
             // B. Lưu Booking và Lấy ID
-            // (Chúng ta sẽ thêm hàm createAndGetId vào BookingModel ở bước tiếp theo)
             $bookingId = $bookingModel->createAndGetId($bookingData); 
 
-            if (!$bookingId) throw new Exception("Lỗi hệ thống khi tạo đơn hàng.");
+            if (!$bookingId) throw new Exception("Lỗi hệ thống khi tạo đơn hàng (Không lấy được ID).");
 
-            // C. Lưu Danh sách thành viên vào bảng khach_tour
+            // C. Lưu Danh sách thành viên
             foreach ($members as $mem) {
                 if (empty($mem['name'])) continue; // Bỏ qua dòng trống
 
@@ -129,21 +142,27 @@ class BookingController extends BaseController {
                     'trang_thai_diem_danh' => 0
                 ];
                 
-                // (Chúng ta sẽ thêm hàm insert vào KhachTourModel ở bước sau)
                 $khachTourModel->insert($khachData);
             }
 
-            // D. Cập nhật số chỗ đã đặt (Gọi hàm updateBookedSeats vừa thêm ở LichKhoiHanhModel)
+            // D. Cập nhật số chỗ đã đặt
             $lkhModel->updateBookedSeats($lichId, $tongKhach);
 
             // Hoàn tất
             $bookingModel->conn->commit();
-            header('Location: index.php?action=admin-bookings&msg=created');
+            
+            // Chuyển hướng thành công
+            echo "<script>
+                alert('Tạo booking thành công!');
+                window.location.href = 'index.php?action=admin-bookings';
+            </script>";
+            exit;
 
         } catch (Exception $e) {
+            // Nếu có lỗi thì Rollback (Hoàn tác)
             $bookingModel->conn->rollBack();
             echo "<script>
-                    alert('LỖI: " . $e->getMessage() . "'); 
+                    alert('LỖI: " . addslashes($e->getMessage()) . "'); 
                     window.history.back();
                   </script>";
         }
