@@ -1,8 +1,6 @@
 <?php
 class AuthController extends BaseController
 {
-
-    // Hiển thị form login
     public function showLoginForm()
     {
         if (isset($_SESSION['user'])) {
@@ -13,70 +11,63 @@ class AuthController extends BaseController
         $this->render('auth/login');
     }
 
-    // Xử lý kiểm tra đăng nhập (Đã Validate chi tiết)
-    // Xử lý kiểm tra đăng nhập (Đã thêm validate độ dài)
     public function handleLogin()
     {
-        // 1. Lấy dữ liệu và loại bỏ khoảng trắng thừa
         $email = trim($_POST['email'] ?? '');
         $pass  = trim($_POST['password'] ?? '');
 
         $errors = [];
-        $old_data = ['email' => $email];
+        
+        if (empty($email)) $errors['email'] = "Chưa nhập email";
+        if (empty($pass))  $errors['password'] = "Chưa nhập mật khẩu";
 
-        // 2. VALIDATE CƠ BẢN (Không để trống)
-        if (empty($email)) {
-            $errors['email'] = "Bạn chưa nhập email";
-        } elseif (strlen($email) < 3 || strlen($email) > 30) {
-            // Validate độ dài Email (3 - 30 ký tự)
-            $errors['email'] = "Email phải từ 3 đến 30 ký tự";
-        }
-
-        if (empty($pass)) {
-            $errors['password'] = "Bạn chưa nhập mật khẩu";
-        } elseif (strlen($pass) < 6 || strlen($pass) > 10) {
-            // Validate độ dài Mật khẩu (6 - 10 ký tự)
-            $errors['password'] = "Mật khẩu phải từ 6 đến 10 ký tự";
-        }
-
-        // 3. Nếu không có lỗi validate form thì mới check DB
         if (empty($errors)) {
             $model = new BaseModel();
 
-            // 3.1 Check Admin
-            $sqlAdmin = "SELECT * FROM admin WHERE email = :e AND mat_khau = :p";
+            // 1. Kiểm tra trong bảng ADMIN
+            $sqlAdmin = "SELECT * FROM admin WHERE email = :e";
             $stmt = $model->conn->prepare($sqlAdmin);
-            $stmt->execute(['e' => $email, 'p' => $pass]);
+            $stmt->execute(['e' => $email]);
             $admin = $stmt->fetch();
 
             if ($admin) {
-                $_SESSION['user'] = $admin;
-                $_SESSION['role'] = 'admin';
-                header('Location: ' . BASE_URL . 'routes/index.php?action=admin-dashboard');
-                exit;
+                // Kiểm tra mật khẩu:
+                // Nếu mật khẩu trong DB chưa mã hóa (VD: '123456') -> so sánh thường
+                // Nếu mật khẩu đã mã hóa (dài > 50 ký tự) -> dùng password_verify
+                $checkPass = false;
+                if (strlen($admin['mat_khau']) < 50 && $admin['mat_khau'] == $pass) {
+                    $checkPass = true; // Cho phép pass cũ
+                } elseif (password_verify($pass, $admin['mat_khau'])) {
+                    $checkPass = true; // Pass đã mã hóa
+                }
+
+                if ($checkPass) {
+                    $_SESSION['user'] = $admin;
+                    $_SESSION['role'] = 'admin';
+                    header('Location: ' . BASE_URL . 'routes/index.php?action=admin-dashboard');
+                    exit;
+                }
             }
 
-            // 3.2 Check Hướng Dẫn Viên
-            $sqlHdv = "SELECT * FROM huong_dan_vien WHERE email = :e AND mat_khau = :p";
+            // 2. Kiểm tra trong bảng HƯỚNG DẪN VIÊN
+            $sqlHdv = "SELECT * FROM huong_dan_vien WHERE email = :e AND trang_thai != 'NghiPhep'";
             $stmt = $model->conn->prepare($sqlHdv);
-            $stmt->execute(['e' => $email, 'p' => $pass]);
+            $stmt->execute(['e' => $email]);
             $hdv = $stmt->fetch();
 
-            if ($hdv) {
+            if ($hdv && password_verify($pass, $hdv['mat_khau'])) {
                 $_SESSION['user'] = $hdv;
                 $_SESSION['role'] = 'hdv';
                 header('Location: ' . BASE_URL . 'routes/index.php?action=hdv-dashboard');
                 exit;
             }
 
-            // 3.3 Sai tài khoản hoặc mật khẩu
             $errors['login_failed'] = "Email hoặc mật khẩu không đúng!";
         }
 
-        // 4. Render view kèm lỗi
         $this->render('auth/login', [
             'errors'   => $errors,
-            'old_data' => $old_data
+            'old_data' => ['email' => $email]
         ]);
     }
 
