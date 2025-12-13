@@ -244,5 +244,27 @@ class LichKhoiHanhModel extends BaseModel
         $stmt->execute(['tour_id' => $tourId]);
         return $stmt->fetchAll();
     }
+
+    public function checkAvailability($lichId, $soLuongKhach) {
+        $sql = "SELECT (so_cho_toi_da - so_cho_da_dat) as cho_trong 
+                FROM lich_khoi_hanh 
+                WHERE id = :id";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute(['id' => $lichId]);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if ($result && $result['cho_trong'] >= $soLuongKhach) {
+            return true; 
+        }
+        return false; 
+    }
+
+    public function updateBookedSeats($lichId, $soLuongThem) {
+        $sql = "UPDATE lich_khoi_hanh 
+                SET so_cho_da_dat = so_cho_da_dat + :so_luong 
+                WHERE id = :id";
+        $stmt = $this->conn->prepare($sql);
+        return $stmt->execute(['so_luong' => $soLuongThem, 'id' => $lichId]);
+    }
 }
 ?>

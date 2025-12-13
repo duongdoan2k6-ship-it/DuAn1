@@ -281,7 +281,7 @@
                                 <form action="<?= BASE_URL ?>routes/index.php?action=hdv-add-nhat-ky" method="POST" enctype="multipart/form-data">
                                     <input type="hidden" name="lich_khoi_hanh_id" value="<?= $lichId ?>">
                                     <div class="mb-2">
-                                        <input type="text" class="form-control fw-bold" name="tieu_de" placeholder="Tiêu đề (VD: Ngày 1)" required>
+                                        <input type="text" class="form-control fw-bold" name="tieu_de" placeholder="Tiêu đề">
                                     </div>
                                     <div class="mb-2">
                                         <textarea class="form-control" name="noi_dung" rows="3" placeholder="Nội dung..." required></textarea>
@@ -409,7 +409,8 @@
                 // Mapping hash với tab button
                 var triggerEl = null;
                 if (hash === '#v-pills-passengers-tab') triggerEl = document.querySelector('#passenger-tab');
-                // Thêm các mapping khác nếu cần
+                // [ĐÃ SỬA] Thêm mapping cho tab Nhật ký
+                if (hash === '#diary-tab-pane') triggerEl = document.querySelector('#diary-tab'); 
                 
                 if (triggerEl) {
                     var tab = new bootstrap.Tab(triggerEl);

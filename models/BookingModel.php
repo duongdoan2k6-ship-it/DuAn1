@@ -64,6 +64,18 @@ class BookingModel extends BaseModel {
         return $this->conn->lastInsertId();
     }
 
+    // [MỚI] Hàm tạo booking và trả về ID (Dùng cho BookingController mới)
+    public function createAndGetId($data) {
+        $sql = "INSERT INTO bookings (lich_khoi_hanh_id, ten_nguoi_dat, sdt_lien_he, email_lien_he, so_nguoi_lon, so_tre_em, tong_tien, ghi_chu, trang_thai) 
+                VALUES (:lich_khoi_hanh_id, :ten_nguoi_dat, :sdt_lien_he, :email_lien_he, :so_nguoi_lon, :so_tre_em, :tong_tien, :ghi_chu, :trang_thai)";
+        
+        $stmt = $this->conn->prepare($sql);
+        if ($stmt->execute($data)) {
+            return $this->conn->lastInsertId();
+        }
+        return false;
+    }
+
     public function getStatus($id) {
         $stmt = $this->conn->prepare("SELECT trang_thai FROM bookings WHERE id = :id");
         $stmt->execute(['id' => $id]);
@@ -93,13 +105,14 @@ class BookingModel extends BaseModel {
 
             $lkhModel = new LichKhoiHanhModel();
 
-            // Nếu HỦY đơn -> Trả lại chỗ
+            // Nếu HỦY đơn -> Trả lại chỗ (Sử dụng hàm updateSoCho có sẵn)
             if ($newStatus === 'Huy' && $oldStatus !== 'Huy') {
                 $lkhModel->updateSoCho($lichId, -($soKhach)); 
             }
 
             // Nếu KHÔI PHỤC đơn -> Kiểm tra và trừ lại chỗ
             if ($oldStatus === 'Huy' && $newStatus !== 'Huy') {
+                // Kiểm tra chỗ trống (Dùng hàm checkSeatAvailability có sẵn)
                 if (!$lkhModel->checkSeatAvailability($lichId, $soKhach)) {
                     throw new Exception("Lịch khởi hành này đã hết chỗ, không thể khôi phục booking!");
                 }
@@ -111,7 +124,7 @@ class BookingModel extends BaseModel {
             $stmt->execute(['status' => $newStatus, 'id' => $id]);
 
             $sqlHistory = "INSERT INTO booking_history (booking_id, nguoi_thay_doi, trang_thai_cu, trang_thai_moi, ghi_chu_thay_doi) 
-                           VALUES (:id, :admin, :old, :new, :note)";
+                            VALUES (:id, :admin, :old, :new, :note)";
             $stmtHistory = $this->conn->prepare($sqlHistory);
             $stmtHistory->execute([
                 'id' => $id,

@@ -8,6 +8,7 @@ class KhachTourModel extends BaseModel {
                     kt.ho_ten_khach,
                     kt.gioi_tinh,
                     kt.loai_khach,
+                    kt.ghi_chu_dac_biet, 
                     kt.trang_thai_diem_danh,
                     b.ten_nguoi_dat,
                     b.sdt_lien_he
@@ -53,6 +54,14 @@ class KhachTourModel extends BaseModel {
             'ghi_chu' => $ghiChu,
             'id' => $khachId
         ]);
+    }
+
+    // [MỚI] Hàm thêm khách tour (Dùng khi tạo Booking)
+    public function insert($data) {
+        $sql = "INSERT INTO khach_tour (booking_id, ho_ten_khach, loai_khach, gioi_tinh, ngay_sinh, ghi_chu_dac_biet, trang_thai_diem_danh) 
+                VALUES (:booking_id, :ho_ten_khach, :loai_khach, :gioi_tinh, :ngay_sinh, :ghi_chu_dac_biet, :trang_thai_diem_danh)";
+        $stmt = $this->conn->prepare($sql);
+        return $stmt->execute($data);
     }
 }
 ?>

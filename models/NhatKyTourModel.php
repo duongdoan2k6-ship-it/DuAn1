@@ -30,12 +30,26 @@ class NhatKyTourModel extends BaseModel
 
     public function updateNhatKy($id, $data)
     {
+        // [ĐÃ SỬA] Thêm cập nhật thoi_gian_tao = NOW()
         // Kiểm tra xem có cập nhật ảnh mới không
         if (!empty($data['hinh_anh'])) {
-            $sql = "UPDATE {$this->tableName} SET tieu_de = :tieu_de, noi_dung = :noi_dung, su_co = :su_co, phan_hoi_khach = :phan_hoi_khach, hinh_anh = :hinh_anh WHERE id = :id";
+            $sql = "UPDATE {$this->tableName} 
+                    SET tieu_de = :tieu_de, 
+                        noi_dung = :noi_dung, 
+                        su_co = :su_co, 
+                        phan_hoi_khach = :phan_hoi_khach, 
+                        hinh_anh = :hinh_anh, 
+                        thoi_gian_tao = NOW() 
+                    WHERE id = :id";
         } else {
             // Nếu không có ảnh mới, không update cột hinh_anh
-            $sql = "UPDATE {$this->tableName} SET tieu_de = :tieu_de, noi_dung = :noi_dung, su_co = :su_co, phan_hoi_khach = :phan_hoi_khach WHERE id = :id";
+            $sql = "UPDATE {$this->tableName} 
+                    SET tieu_de = :tieu_de, 
+                        noi_dung = :noi_dung, 
+                        su_co = :su_co, 
+                        phan_hoi_khach = :phan_hoi_khach, 
+                        thoi_gian_tao = NOW() 
+                    WHERE id = :id";
             unset($data['hinh_anh']); // Bỏ key hinh_anh khỏi mảng data
         }
 

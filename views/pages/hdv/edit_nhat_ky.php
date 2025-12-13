@@ -18,22 +18,22 @@
 
                     <div class="mb-3">
                         <label class="form-label fw-bold">Tiêu đề</label>
-                        <input type="text" class="form-control" name="tieu_de" value="<?= htmlspecialchars($log['tieu_de']) ?>" required>
+                        <input type="text" class="form-control" name="tieu_de" value="<?= htmlspecialchars($log['tieu_de'] ?? '') ?>" required>
                     </div>
 
                     <div class="mb-3">
                         <label class="form-label fw-bold">Nội dung</label>
-                        <textarea class="form-control" name="noi_dung" rows="5" required><?= htmlspecialchars($log['noi_dung']) ?></textarea>
+                         <textarea class="form-control" name="noi_dung" rows="5" required><?= htmlspecialchars($log['noi_dung'] ?? '') ?></textarea>
                     </div>
 
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label class="form-label text-danger fw-bold">Sự cố (nếu có)</label>
-                            <textarea class="form-control" name="su_co" rows="3"><?= htmlspecialchars($log['su_co']) ?></textarea>
+                            <textarea class="form-control" name="su_co" rows="3"><?= htmlspecialchars($log['su_co'] ?? '') ?></textarea>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label text-info fw-bold">Phản hồi khách</label>
-                            <textarea class="form-control" name="phan_hoi_khach" rows="3"><?= htmlspecialchars($log['phan_hoi_khach']) ?></textarea>
+                            <textarea class="form-control" name="phan_hoi_khach" rows="3"><?= htmlspecialchars($log['phan_hoi_khach'] ?? '') ?></textarea>
                         </div>
                     </div>
 

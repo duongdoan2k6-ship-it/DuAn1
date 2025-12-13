@@ -78,9 +78,17 @@ class HdvController extends BaseController
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $lichId = $_POST['lich_khoi_hanh_id'];
 
+            // --- [SỬA ĐOẠN NÀY] Tự động tạo tiêu đề nếu để trống ---
+            $tieuDe = trim($_POST['tieu_de'] ?? '');
+            if (empty($tieuDe)) {
+                date_default_timezone_set('Asia/Ho_Chi_Minh'); // Đặt múi giờ VN
+                $tieuDe = 'Nhật ký ' . date('H:i d/m/Y');
+            }
+            // -------------------------------------------------------
+
             $data = [
                 'lich_khoi_hanh_id' => $lichId,
-                'tieu_de'           => $_POST['tieu_de'] ?? '',
+                'tieu_de'           => $tieuDe, // Sử dụng biến $tieuDe đã xử lý ở trên
                 'noi_dung'          => $_POST['noi_dung'] ?? '',
                 'su_co'             => $_POST['su_co'] ?? '',
                 'phan_hoi_khach'    => $_POST['phan_hoi_khach'] ?? '',
@@ -108,7 +116,8 @@ class HdvController extends BaseController
                 $status = 'log_error';
             }
 
-            header('Location: ' . BASE_URL . 'routes/index.php?action=hdv-tour-detail&id=' . $lichId . '&status=' . $status);
+            // Thêm #diary-tab-pane để khi reload trang sẽ tự động mở tab Nhật ký
+            header('Location: ' . BASE_URL . 'routes/index.php?action=hdv-tour-detail&id=' . $lichId . '&status=' . $status . '#diary-tab-pane');
             exit;
         }
     }
@@ -233,7 +242,7 @@ class HdvController extends BaseController
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $lichId = $_POST['lich_id'];
             $phienId = $_POST['phien_id'];
-            $attendanceData = $_POST['attendance'] ?? []; // Mảng: khach_id => [status, note]
+            $attendanceData = $_POST['attendance'] ?? [];
 
             $success = true;
             foreach ($attendanceData as $khachId => $data) {

@@ -17,10 +17,11 @@ class DiemDanhModel extends BaseModel
                 k.id AS khach_id, 
                 k.ho_ten_khach, 
                 b.sdt_lien_he,                                
-                COALESCE(ddct.trang_thai, 0) AS trang_thai, -- Nếu chưa có record thì mặc định là 0 (Vắng/Chưa điểm)
+                COALESCE(ddct.trang_thai, 0) AS trang_thai, -- Mặc định là 0 (Chưa điểm danh) nếu null
                 ddct.ghi_chu
             FROM khach_tour k
             JOIN bookings b ON k.booking_id = b.id
+            -- LEFT JOIN để vẫn hiện khách kể cả khi lỗi chưa có trong bảng chi tiết
             LEFT JOIN chi_tiet_diem_danh ddct 
                 ON k.id = ddct.khach_id AND ddct.phien_id = :phien_id 
             WHERE b.lich_khoi_hanh_id = :lich_id
@@ -37,11 +38,11 @@ class DiemDanhModel extends BaseModel
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    // 3. [NÂNG CẤP] Tạo phiên điểm danh mới & Tự động thêm khách vào danh sách
+    // 3. [QUAN TRỌNG] Tạo phiên mới & TỰ ĐỘNG THÊM KHÁCH
     public function createPhien($lichId, $tieuDe)
     {
         try {
-            // Bắt đầu transaction để đảm bảo dữ liệu nhất quán
+            // Sử dụng Transaction để đảm bảo toàn vẹn dữ liệu
             $this->conn->beginTransaction();
 
             // Bước 1: Tạo phiên điểm danh (Header)
@@ -50,7 +51,8 @@ class DiemDanhModel extends BaseModel
             $stmt->execute(['id' => $lichId, 'tieu_de' => $tieuDe]);
             $phienId = $this->conn->lastInsertId();
 
-            // Bước 2: Lấy danh sách khách hợp lệ (Đã xác nhận/Đã thanh toán) của tour này
+            // Bước 2: Lấy danh sách khách hợp lệ (Đã xác nhận/Đã thanh toán) từ tour này
+            // Logic này sửa lỗi danh sách trống
             $sqlGetKhach = "SELECT kt.id 
                             FROM khach_tour kt
                             JOIN bookings b ON kt.booking_id = b.id
@@ -60,6 +62,7 @@ class DiemDanhModel extends BaseModel
             $stmtGet->execute(['lid' => $lichId]);
             $khachs = $stmtGet->fetchAll(PDO::FETCH_ASSOC);
 
+            // Bước 3: Insert từng khách vào bảng chi tiết điểm danh
             if (!empty($khachs)) {
                 $sqlInsertDetail = "INSERT INTO chi_tiet_diem_danh (phien_id, khach_id, trang_thai) VALUES (:pid, :kid, 0)";
                 $stmtInsert = $this->conn->prepare($sqlInsertDetail);
@@ -68,17 +71,20 @@ class DiemDanhModel extends BaseModel
                     $stmtInsert->execute(['pid' => $phienId, 'kid' => $k['id']]);
                 }
             }
-            $this->conn->commit();
+            
+            $this->conn->commit(); // Lưu tất cả
             return $phienId;
 
         } catch (Exception $e) {
-            $this->conn->rollBack();
+            $this->conn->rollBack(); // Hoàn tác nếu lỗi
             return false;
         }
     }
 
+    // 4. Lưu/Cập nhật trạng thái điểm danh
     public function saveChiTiet($phienId, $khachId, $trangThai, $ghiChu = null)
     {
+        // Dùng ON DUPLICATE KEY UPDATE để vừa có thể Thêm mới vừa có thể Sửa
         $sql = "INSERT INTO chi_tiet_diem_danh (phien_id, khach_id, trang_thai, ghi_chu) 
                 VALUES (:phien_id, :khach_id, :trang_thai, :ghi_chu)
                 ON DUPLICATE KEY UPDATE trang_thai = :trang_thai_update, ghi_chu = :ghi_chu_update";
