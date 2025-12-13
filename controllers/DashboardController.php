@@ -83,9 +83,22 @@ public function index()
 
             $tour_id = $_POST['tour_id'];
             $ngay_di = $_POST['ngay_khoi_hanh'];
-            $ngay_ve = $_POST['ngay_ket_thuc'];
+            $ngay_ve = $_POST['ngay_ket_thuc']; // Lấy từ input readonly của form
 
-            // [FIX] Validate Ngày: Ngày về không được trước ngày đi
+            // --- [THÊM MỚI] VALIDATE NGÀY KHỞI HÀNH (BACKEND) ---
+            // Mục đích: Chặn trường hợp user cố tình sửa HTML để chọn ngày sớm hơn
+            // Logic: Ngày đi phải lớn hơn hoặc bằng (Hôm nay + 3 ngày)
+            $minTimestamp = strtotime(date('Y-m-d') . ' +3 days'); 
+            $inputTimestamp = strtotime($ngay_di);
+
+            if ($inputTimestamp < $minTimestamp) {
+                echo "<script>
+                    alert('Lỗi: Ngày khởi hành phải cách hiện tại ít nhất 3 ngày để có thời gian chuẩn bị!'); 
+                    window.history.back();
+                </script>";
+                return;
+            }
+
             if (strtotime($ngay_ve) < strtotime($ngay_di)) {
                 echo "<script>alert('Lỗi: Ngày kết thúc phải sau hoặc bằng Ngày khởi hành!'); window.history.back();</script>";
                 return;

@@ -40,13 +40,18 @@
                                     <div class="row">
                                         <div class="col-md-6 mb-3">
                                             <label class="fw-bold">Ngày Giờ Khởi Hành</label>
+                                            <small class="text-muted d-block mb-1">(Phải cách hôm nay ít nhất 3 ngày)</small>
                                             <input type="text" id="ngay_khoi_hanh" name="ngay_khoi_hanh" 
                                                    class="form-control datetimepicker" placeholder="Chọn ngày đi..." required>
                                         </div>
                                         <div class="col-md-6 mb-3">
                                             <label class="fw-bold">Ngày Giờ Kết Thúc</label>
+                                            <small class="text-muted d-block mb-1">(Tự động tính toán)</small>
                                             <input type="text" id="ngay_ket_thuc" name="ngay_ket_thuc" 
-                                                   class="form-control datetimepicker" placeholder="Tự động tính..." required>
+                                                   class="form-control datetimepicker" 
+                                                   placeholder="Chọn tour và ngày đi..." 
+                                                   style="background-color: #e9ecef; cursor: not-allowed;"
+                                                   readonly required>
                                         </div>
                                     </div>
 
@@ -107,25 +112,37 @@
     <script src="https://npmcdn.com/flatpickr/dist/l10n/vn.js"></script> 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Cấu hình lịch chung
-            const config = {
-                enableTime: true,       // Cho phép chọn giờ
-                dateFormat: "Y-m-d H:i", // Định dạng gửi về server (giống MySQL)
-                altInput: true,         // Hiển thị đẹp hơn cho người dùng
-                altFormat: "d/m/Y H:i", // Định dạng hiển thị: Ngày/Tháng/Năm Giờ:Phút
-                time_24hr: true,        // Chế độ 24h
-                locale: "vn",           // Tiếng Việt
-                minDate: "today"        // Không cho chọn ngày quá khứ
+            // Cấu hình cơ bản
+            const baseConfig = {
+                enableTime: true,       
+                dateFormat: "Y-m-d H:i", 
+                altInput: true,         
+                altFormat: "d/m/Y H:i", 
+                time_24hr: true,        
+                locale: "vn"           
             };
 
-            // Khởi tạo Flatpickr cho 2 ô input
-            const fp_start = flatpickr("#ngay_khoi_hanh", config);
-            const fp_end = flatpickr("#ngay_ket_thuc", config);
+            // 1. Cấu hình NGÀY ĐI: Chặn ngày quá khứ + 3 ngày
+            const startConfig = {
+                ...baseConfig,
+                // Dùng PHP để in ra ngày tối thiểu (Hiện tại + 3 ngày)
+                minDate: "<?= date('Y-m-d', strtotime('+4 days')) ?>" 
+            };
+
+            // 2. Cấu hình NGÀY VỀ: Tắt chức năng mở lịch (chỉ hiển thị)
+            const endConfig = {
+                ...baseConfig,
+                clickOpens: false, // Quan trọng: Không cho người dùng bấm mở lịch
+                allowInput: false  // Không cho nhập tay
+            };
+
+            // Khởi tạo Flatpickr
+            const fp_start = flatpickr("#ngay_khoi_hanh", startConfig);
+            const fp_end = flatpickr("#ngay_ket_thuc", endConfig);
 
             // --- TÍNH NĂNG TỰ ĐỘNG TÍNH NGÀY VỀ ---
             const tourSelect = document.getElementById('tour_select');
             
-            // Hàm tính ngày về
             function calculateEndDate() {
                 // Lấy ngày đi đang chọn
                 const startDateStr = document.getElementById('ngay_khoi_hanh').value;
@@ -146,9 +163,7 @@
                     fp_end.setDate(endDate);
                 }
             }
-
             document.getElementById('ngay_khoi_hanh').addEventListener('change', calculateEndDate);
-            
             tourSelect.addEventListener('change', calculateEndDate);
         });
     </script>
