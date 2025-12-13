@@ -79,7 +79,7 @@
                                             <?php endforeach; ?>
                                         </select>
                                         <div class="form-text text-muted fst-italic">
-                                            * Hệ thống sẽ báo lỗi nếu HDV bị trùng lịch.
+                                            * Bạn có thể phân công thêm Tài xế/Hậu cần sau khi tạo xong.
                                         </div>
                                     </div>
 
@@ -104,7 +104,8 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-    <script src="https://npmcdn.com/flatpickr/dist/l10n/vn.js"></script> <script>
+    <script src="https://npmcdn.com/flatpickr/dist/l10n/vn.js"></script> 
+    <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Cấu hình lịch chung
             const config = {
@@ -136,26 +137,18 @@
 
                 if (days > 0) {
                     const startDate = new Date(startDateStr);
-                    
-                    // Tính ngày về: Ngày đi + (Số ngày - 1)
-                    // Ví dụ: Đi ngày 1, Tour 3 ngày -> Về ngày 3 (Ngày 1, 2, 3)
-                    // Nhưng ở đây ta cứ cộng đủ số ngày để tính giờ checkout cho thoải mái, hoặc trừ 1 tùy logic của bạn.
-                    // Thông thường check-out là trưa ngày cuối cùng.
+
                     const endDate = new Date(startDate);
                     endDate.setDate(endDate.getDate() + (days - 1)); 
-                    
-                    // Set giờ về mặc định là 17:00 (5h chiều) nếu chưa chọn giờ
+
                     endDate.setHours(17, 0, 0, 0);
 
-                    // Cập nhật ô ngày về
                     fp_end.setDate(endDate);
                 }
             }
 
-            // Khi thay đổi ngày đi -> Tính lại ngày về
             document.getElementById('ngay_khoi_hanh').addEventListener('change', calculateEndDate);
             
-            // Khi chọn lại Tour khác (số ngày khác) -> Tính lại ngày về
             tourSelect.addEventListener('change', calculateEndDate);
         });
     </script>

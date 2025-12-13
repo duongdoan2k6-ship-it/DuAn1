@@ -20,7 +20,14 @@
         
         <?php if (isset($_GET['msg'])): ?>
             <div class="alert alert-success alert-dismissible fade show">
-                <i class="bi bi-check-circle"></i> <?= htmlspecialchars($_GET['msg']) ?>
+                <i class="bi bi-check-circle"></i> 
+                <?php 
+                    $msg = $_GET['msg'];
+                    if($msg == 'updated') echo 'Cập nhật thông tin thành công!';
+                    elseif($msg == 'Staff assigned successfully') echo 'Đã thêm nhân sự vào đoàn!';
+                    elseif($msg == 'Staff removed') echo 'Đã gỡ nhân sự khỏi đoàn!';
+                    else echo htmlspecialchars($msg);
+                ?>
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
         <?php endif; ?>

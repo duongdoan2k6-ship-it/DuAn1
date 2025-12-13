@@ -25,14 +25,18 @@ match ($action) {
     'hdv-update-nhat-ky' => (new HdvController)->updateNhatKy(),
     'hdv-delete-nhat-ky' => (new HdvController)->deleteNhatKy(),
 
-    // Quản lý Lịch Trình (Tạo / Sửa / Xóa)
-    'admin-create-lich' => (new DashboardController)->create(),
-    'admin-store-lich'  => (new DashboardController)->store(),
-    'admin-edit-lich'   => (new DashboardController)->edit(),
+    // --- [SỬA ĐỔI QUAN TRỌNG] Quản lý Lịch Khởi Hành ---
+    // Chuyển quyền xử lý từ DashboardController sang TourController (nơi vừa thêm code logic)
+    'admin-create-lich' => (new TourController)->createLich(),
+    'admin-store-lich'  => (new TourController)->storeLich(),
     
-    // [CẬP NHẬT] Đổi sang TourController để xử lý cập nhật lịch
+    // Route sửa lịch (Admin) - Mapping với form sửa và phân công
+    'admin-schedule-staff' => (new TourController)->editSchedule(),
+    
+    // Route xử lý cập nhật lịch (POST)
     'admin-update-lich' => (new TourController)->updateSchedule(), 
     
+    // Xử lý xóa lịch (nếu chưa chuyển sang TourController thì tạm thời để DashboardController hoặc bổ sung sau)
     'admin-delete-lich' => (new DashboardController)->delete(),
 
     // Quản lý Booking (Đặt Tour)
@@ -69,14 +73,13 @@ match ($action) {
     'admin-supplier-update' => (new SupplierController)->update(),
     'admin-supplier-delete' => (new SupplierController)->delete(),
 
-    // Điều hành Dịch vụ (Giữ nguyên DashboardController nếu chưa chuyển)
+    // Điều hành Dịch vụ
     'admin-schedule-services'      => (new DashboardController)->services(),    
     'admin-schedule-service-store' => (new DashboardController)->storeService(),
     'admin-schedule-service-delete'=> (new DashboardController)->deleteService(),
     'admin-schedule-service-update'=> (new DashboardController)->updateService(),
 
-    // [CẬP NHẬT] Điều hành Phân bổ Nhân sự (Chuyển sang TourController)
-    'admin-schedule-staff' => (new TourController)->editSchedule(), // Form Sửa Lịch & Phân công
+    // Điều hành Phân bổ Nhân sự
     'admin-add-staff'      => (new TourController)->addStaff(),     // Xử lý thêm nhân sự
     'admin-remove-staff'   => (new TourController)->removeStaff(),  // Xử lý xóa nhân sự
 
@@ -91,6 +94,8 @@ match ($action) {
 
     // Chức năng Cập nhật Ghi chú Đặc biệt (HDV)
     'hdv-update-khach-note' => (new HdvController)->updateYeuCauDacBiet(),
+
+    'admin-lich-detail' => (new TourController)->detailLich(),
 
     default             => (new AuthController)->showLoginForm(),
 };

@@ -2,12 +2,12 @@
 class TourController extends BaseController {
     private $tourModel;
     private $supplierModel;
-    private $lichModel; // [MỚI] Khai báo model Lịch Khởi Hành
+    private $lichModel; // Khai báo model Lịch Khởi Hành
 
     public function __construct() {
         $this->tourModel = new TourModel();
         $this->supplierModel = new SupplierModel();
-        $this->lichModel = new LichKhoiHanhModel(); // [MỚI] Khởi tạo model
+        $this->lichModel = new LichKhoiHanhModel(); // Khởi tạo model
     }
 
     public function index() {
@@ -264,10 +264,66 @@ class TourController extends BaseController {
     }
 
     // =========================================================================
-    // [PHẦN MỚI] QUẢN LÝ LỊCH TRÌNH & PHÂN CÔNG NHÂN SỰ
+    // [PHẦN MỚI BỔ SUNG] QUẢN LÝ LỊCH TRÌNH & PHÂN CÔNG NHÂN SỰ
     // =========================================================================
 
-    // 1. Hiển thị form sửa lịch & phân công (Mapping với action: admin-schedule-staff)
+    // 1. Hiển thị form thêm lịch (Mapping: admin-create-lich)
+    public function createLich() {
+        $tours = $this->tourModel->getAll();
+        // Lấy danh sách HDV đang sẵn sàng để chọn nhanh
+        $guides = $this->lichModel->getAllHDVList(); 
+        
+        $this->render('pages/admin/form_them_lich', [
+            'tours' => $tours,
+            'guides' => $guides
+        ]);
+    }
+
+    // 2. Xử lý lưu lịch mới (Mapping: admin-store-lich)
+    public function storeLich() {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            // Lấy dữ liệu từ form
+            $data = [
+                'tour_id' => $_POST['tour_id'],
+                'ngay_khoi_hanh' => $_POST['ngay_khoi_hanh'],
+                'ngay_ket_thuc' => $_POST['ngay_ket_thuc'],
+                'diem_tap_trung' => $_POST['diem_tap_trung'],
+                'so_cho_toi_da' => $_POST['so_cho_toi_da'],
+                // Lưu ý: hdv_id và ghi_chu_nhan_su sẽ được tách ra xử lý riêng
+                'hdv_id' => $_POST['hdv_id'] ?? null, 
+                'ghi_chu_nhan_su' => $_POST['ghi_chu_nhan_su'] ?? ''
+            ];
+
+            try {
+                $this->lichModel->conn->beginTransaction();
+
+                // 1. Insert vào bảng lich_khoi_hanh
+                // Hàm insert trong Model đã có unset('hdv_id') nên không lo lỗi dư cột
+                $lichId = $this->lichModel->insert($data);
+
+                if ($lichId) {
+                    // 2. Nếu có chọn HDV chính, insert ngay vào bảng lich_nhan_vien
+                    if (!empty($data['hdv_id'])) {
+                        // Gán vai trò là HDV_chinh
+                        $this->lichModel->assignStaff($lichId, $data['hdv_id'], 'HDV_chinh');
+                    }
+
+                    // 3. (Tuỳ chọn) Bạn có thể lưu ghi chú nhân sự vào bảng riêng nếu cần
+                    // hiện tại hệ thống chỉ xử lý lưu HDV chính.
+                }
+
+                $this->lichModel->conn->commit();
+                // Chuyển hướng đến trang chi tiết để có thể thêm các nhân sự khác
+                header('Location: index.php?action=admin-schedule-staff&id=' . $lichId . '&msg=Lịch trình đã được tạo thành công');
+            } catch (Exception $e) {
+                $this->lichModel->conn->rollBack();
+                // Redirect về trang tạo và báo lỗi
+                header('Location: index.php?action=admin-create-lich&error=' . urlencode($e->getMessage()));
+            }
+        }
+    }
+
+    // 3. Hiển thị form sửa lịch & phân công (Mapping với action: admin-schedule-staff)
     public function editSchedule() {
         $id = $_GET['id'] ?? 0;
         
@@ -295,7 +351,7 @@ class TourController extends BaseController {
         ]);
     }
 
-    // 2. Cập nhật thông tin lịch trình (Mapping với action: admin-update-lich)
+    // 4. Cập nhật thông tin lịch trình (Mapping với action: admin-update-lich)
     public function updateSchedule() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $id = $_POST['id'];
@@ -362,6 +418,30 @@ class TourController extends BaseController {
             return $fileName;
         }
         return false;
+    }
+    public function detailLich() {
+        $id = $_GET['id'] ?? 0;
+        
+        // 1. Thông tin lịch & Tour
+        $lich = $this->lichModel->getDetail($id);
+        if (!$lich) die("Lịch trình không tồn tại!");
+
+        // 2. Thông tin nhân sự
+        $staff = $this->lichModel->getAssignedStaff($id);
+
+        // 3. Danh sách Booking của lịch này
+        $bookingModel = new BookingModel();
+        $bookings = $bookingModel->getAllBookings(['lich_id' => $id]);
+
+        // 4. Danh sách tất cả hành khách (Manifest)
+        $passengers = $bookingModel->getPassengersByLich($id);
+
+        $this->render('pages/admin/tours/chi_tiet_lich', [
+            'lich' => $lich,
+            'staff' => $staff,
+            'bookings' => $bookings,
+            'passengers' => $passengers
+        ]);
     }
 }
 ?>

@@ -157,6 +157,8 @@ class BookingController extends BaseController {
         
         $booking = $bookingModel->getDetail($id); 
         $history = $bookingModel->getHistory($id);
+        
+        $guests = $bookingModel->getGuests($id); 
 
         if (!$booking) {
             echo "Không tìm thấy đơn hàng!";
@@ -165,7 +167,8 @@ class BookingController extends BaseController {
 
         $this->render('pages/admin/bookings/detail', [
             'booking' => $booking,
-            'history' => $history
+            'history' => $history,
+            'guests'  => $guests 
         ]);
     }
 }

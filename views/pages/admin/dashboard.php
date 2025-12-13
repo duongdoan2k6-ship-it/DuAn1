@@ -32,7 +32,16 @@
                 elseif ($msg == 'updated') echo "Cập nhật thành công!";
                 elseif ($msg == 'deleted') echo "Đã xóa dữ liệu!";
                 elseif ($msg == 'assigned') echo "Phân bổ nhân sự thành công!";
+                elseif ($msg == 'created') echo "Tạo lịch trình thành công!";
+                else echo htmlspecialchars($msg);
                 ?>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        <?php endif; ?>
+
+        <?php if (isset($_GET['error'])): ?>
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                Lỗi: <?= htmlspecialchars($_GET['error']) ?>
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
         <?php endif; ?>
@@ -42,7 +51,7 @@
                 <div class="card text-white bg-primary mb-3 shadow h-100">
                     <div class="card-header fw-bold"><i class="fas fa-plane-departure"></i> LỊCH KHỞI HÀNH</div>
                     <div class="card-body">
-                        <h1 class="card-title display-4 fw-bold"><?= $totalTours ?></h1>
+                        <h1 class="card-title display-4 fw-bold"><?= $totalTours ?? 0 ?></h1>
                         <p class="card-text">Chuyến đi đang vận hành.</p>
                     </div>
                 </div>
@@ -85,7 +94,7 @@
                         <i class="fas fa-plus-circle"></i> Thêm Lịch Mới
                     </a>
                     <a href="<?= BASE_URL ?>routes/index.php?action=admin-statistics" class="btn btn-sm btn-success">
-                        <i class="fas fa"></i> Báo Cáo & Thống Kê
+                        <i class="fas fa-chart-bar"></i> Báo Cáo & Thống Kê
                     </a>
                 </div>
             </div>
@@ -142,7 +151,7 @@
                                             <div class="fw-bold"><?= $tour['so_cho_da_dat'] ?> / <?= $tour['so_cho_toi_da'] ?></div>
                                             <div class="progress mt-1" style="height: 5px; width: 80px; margin: 0 auto;">
                                                 <?php
-                                                $percent = ($tour['so_cho_da_dat'] / $tour['so_cho_toi_da']) * 100;
+                                                $percent = ($tour['so_cho_toi_da'] > 0) ? ($tour['so_cho_da_dat'] / $tour['so_cho_toi_da']) * 100 : 0;
                                                 $colorBar = $percent >= 100 ? 'bg-danger' : 'bg-success';
                                                 ?>
                                                 <div class="progress-bar <?= $colorBar ?>" role="progressbar" style="width: <?= $percent ?>%"></div>
@@ -168,7 +177,7 @@
 
                                         <td class="text-center">
                                             <div class="btn-group" role="group">
-                                                <a href="<?= BASE_URL ?>routes/index.php?action=admin-booking-detail&id=<?= $tour['id'] ?>"
+                                                <a href="<?= BASE_URL ?>routes/index.php?action=admin-lich-detail&id=<?= $tour['id'] ?>"
                                                     class="btn btn-sm btn-outline-info" title="Danh sách khách">
                                                     Chi tiết
                                                 </a>

@@ -2,37 +2,53 @@
 class BookingModel extends BaseModel {
     
     // 1. Lấy danh sách booking (Có hỗ trợ bộ lọc)
-    public function getAllBookings($filters = []) {
+   public function getAllBookings($filters = []) {
         $sql = "SELECT b.*, t.ten_tour, lkh.ngay_khoi_hanh 
                 FROM bookings b
                 JOIN lich_khoi_hanh lkh ON b.lich_khoi_hanh_id = lkh.id
                 JOIN tours t ON lkh.tour_id = t.id
-                WHERE 1=1"; // Điều kiện gốc để dễ nối chuỗi
+                WHERE 1=1"; 
         
         $params = [];
 
-        // Lọc theo từ khóa (Tên khách, SĐT, Mã đơn)
         if (!empty($filters['keyword'])) {
             $sql .= " AND (b.ten_nguoi_dat LIKE :kw OR b.sdt_lien_he LIKE :kw OR b.id LIKE :kw)";
             $params['kw'] = '%' . $filters['keyword'] . '%';
         }
 
-        // Lọc theo trạng thái
         if (!empty($filters['status'])) {
             $sql .= " AND b.trang_thai = :status";
             $params['status'] = $filters['status'];
         }
 
-        // Lọc theo Tour cụ thể
         if (!empty($filters['tour_id'])) {
             $sql .= " AND t.id = :tour_id";
             $params['tour_id'] = $filters['tour_id'];
+        }
+
+        // [MỚI] Lọc theo ID lịch khởi hành cụ thể
+        if (!empty($filters['lich_id'])) {
+            $sql .= " AND b.lich_khoi_hanh_id = :lich_id";
+            $params['lich_id'] = $filters['lich_id'];
         }
 
         $sql .= " ORDER BY b.ngay_dat DESC";
         
         $stmt = $this->conn->prepare($sql);
         $stmt->execute($params);
+        return $stmt->fetchAll();
+    }
+
+    // [MỚI] Lấy danh sách tất cả hành khách của 1 lịch khởi hành (Để in danh sách đoàn)
+    public function getPassengersByLich($lichId) {
+        $sql = "SELECT kt.*, b.sdt_lien_he, b.ten_nguoi_dat 
+                FROM khach_tour kt
+                JOIN bookings b ON kt.booking_id = b.id
+                WHERE b.lich_khoi_hanh_id = :lich_id 
+                AND b.trang_thai IN ('DaXacNhan', 'DaThanhToan')
+                ORDER BY kt.ho_ten_khach ASC";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute(['lich_id' => $lichId]);
         return $stmt->fetchAll();
     }
 
@@ -144,6 +160,13 @@ class BookingModel extends BaseModel {
     
     public function getHistory($bookingId) {
         $sql = "SELECT * FROM booking_history WHERE booking_id = :id ORDER BY thoi_gian DESC";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute(['id' => $bookingId]);
+        return $stmt->fetchAll();
+    }
+
+    public function getGuests($bookingId) {
+        $sql = "SELECT * FROM khach_tour WHERE booking_id = :id";
         $stmt = $this->conn->prepare($sql);
         $stmt->execute(['id' => $bookingId]);
         return $stmt->fetchAll();
