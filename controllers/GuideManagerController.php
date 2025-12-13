@@ -47,7 +47,7 @@ class GuideManagerController extends BaseController {
                 if ($uploaded) $anh = $uploaded;
             }
 
-            // 3. Hash mật khẩu
+            // 3. Hash mật khẩu (Đã có từ bước trước)
             $mat_khau_hash = password_hash($_POST['mat_khau'], PASSWORD_DEFAULT);
 
             $data = [
@@ -134,17 +134,15 @@ class GuideManagerController extends BaseController {
         }
     }
 
+    // [QUAN TRỌNG] Hàm xóa đã được sửa lại cho Soft Delete
     public function delete() {
         $id = $_GET['id'] ?? 0;
-        $guide = $this->guideModel->getDetail($id);
         
-        // Xóa ảnh trước
-        if ($guide && $guide['anh_dai_dien'] != 'default_avatar.png') {
-            $path = 'assets/uploads/hdv/' . $guide['anh_dai_dien'];
-            if (file_exists($path)) unlink($path);
-        }
-
-        $this->guideModel->delete($id);
+        // [THAY ĐỔI] Đã bỏ đoạn code xóa ảnh vật lý (unlink)
+        // Vì đây là xóa mềm, chúng ta cần giữ lại ảnh để có thể khôi phục sau này
+        
+        $this->guideModel->delete($id); // Model sẽ cập nhật deleted_at
+        
         header('Location: ' . BASE_URL . 'routes/index.php?action=admin-guides&msg=deleted');
     }
 

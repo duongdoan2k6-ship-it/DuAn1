@@ -14,7 +14,7 @@ class BookingController extends BaseController {
         $this->render('pages/admin/bookings', ['bookings' => $bookings]);
     }
 
-    // --- [ĐÃ SỬA] Xử lý đổi trạng thái & Ghi lịch sử ---
+    // --- Xử lý đổi trạng thái & Ghi lịch sử ---
     public function updateStatus() {
         // 1. Kiểm tra quyền Admin
         if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
@@ -25,7 +25,7 @@ class BookingController extends BaseController {
         $id = $_GET['id'] ?? 0;
         $status = $_GET['status'] ?? '';
 
-        // 2. Lấy tên admin từ Session (Dựa vào AuthController: $_SESSION['user'] chứa thông tin admin)
+        // 2. Lấy tên admin từ Session
         $adminName = $_SESSION['user']['ho_ten'] ?? 'Administrator'; 
 
         // Các trạng thái hợp lệ
@@ -47,7 +47,6 @@ class BookingController extends BaseController {
                 exit;
             } else {
                 // Thất bại (Thường là do Tour hết chỗ khi cố gắng khôi phục vé Hủy)
-                // Sử dụng JS để Alert rồi mới chuyển trang
                 echo "<script>
                         alert('KHÔNG THỂ CẬP NHẬT TRẠNG THÁI!\\n\\nNguyên nhân có thể:\\n1. Tour đã hết chỗ trống (khi bạn khôi phục vé Hủy).\\n2. Lỗi hệ thống.');
                         window.location.href = '" . BASE_URL . "routes/index.php?action=admin-bookings';
@@ -71,54 +70,78 @@ class BookingController extends BaseController {
         $this->render('pages/admin/bookings/create', ['schedules' => $schedules]);
     }
 
-    // 2. Xử lý lưu booking
+    // 2. [QUAN TRỌNG] Xử lý lưu booking với Transaction để chống Overbooking
     public function store() {
         if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') exit;
 
-        // Nhận dữ liệu
+        // Nhận dữ liệu từ form
         $lichId = $_POST['lich_khoi_hanh_id'];
         $soLon = (int)$_POST['so_nguoi_lon'];
         $soTre = (int)($_POST['so_tre_em'] ?? 0);
         $tongKhach = $soLon + $soTre;
 
-        // Kiểm tra logic: Chỗ trống
+        // Khởi tạo các Model cần thiết
         $lkhModel = new LichKhoiHanhModel();
-        $lkh = $lkhModel->getDetail($lichId);
-        
-        // Cần query thêm giá tour để tính tiền
-        $tourModel = new TourModel();
-        $tour = $tourModel->getDetail($lkh['tour_id']);
-
-        // Kiểm tra chỗ
-        if (($lkh['so_cho_da_dat'] + $tongKhach) > $lkh['so_cho_toi_da']) {
-            echo "<script>alert('Không đủ chỗ trống!'); window.history.back();</script>";
-            exit;
-        }
-
-        // Tính tiền
-        $tongTien = ($soLon * $tour['gia_nguoi_lon']) + ($soTre * $tour['gia_tre_em']);
-
-        // Lưu vào DB
         $bookingModel = new BookingModel();
-        $data = [
-            'lich_id' => $lichId,
-            'ten' => $_POST['ten_nguoi_dat'],
-            'sdt' => $_POST['sdt_lien_he'],
-            'email' => $_POST['email_lien_he'],
-            'sl_lon' => $soLon,
-            'sl_tre' => $soTre,
-            'tong_tien' => $tongTien,
-            'ghi_chu' => $_POST['ghi_chu']
-        ];
+        $tourModel = new TourModel();
 
-        $newId = $bookingModel->create($data);
+        try {
+            // BẮT ĐẦU TRANSACTION (Khóa dữ liệu để xử lý an toàn)
+            $bookingModel->conn->beginTransaction();
 
-        if ($newId) {
-            // Cập nhật số chỗ đã đặt
+            // 1. Lấy thông tin lịch và KHÓA dòng này lại (ngăn người khác đặt cùng lúc)
+            // Hàm getDetailForUpdate() đã được thêm ở bước trước trong LichKhoiHanhModel
+            $lkh = $lkhModel->getDetailForUpdate($lichId);
+
+            if (!$lkh) {
+                throw new Exception("Lịch khởi hành không tồn tại!");
+            }
+
+            // 2. Kiểm tra lại chỗ trống (Dữ liệu $lkh lúc này là mới nhất và độc quyền)
+            if (($lkh['so_cho_da_dat'] + $tongKhach) > $lkh['so_cho_toi_da']) {
+                throw new Exception("Rất tiếc, vừa có người đặt và hiện tại tour không đủ chỗ trống!");
+            }
+
+            // 3. Tính tiền
+            $tour = $tourModel->getDetail($lkh['tour_id']);
+            $tongTien = ($soLon * $tour['gia_nguoi_lon']) + ($soTre * $tour['gia_tre_em']);
+
+            // 4. Lưu Booking vào Database
+            $data = [
+                'lich_id' => $lichId,
+                'ten' => $_POST['ten_nguoi_dat'],
+                'sdt' => $_POST['sdt_lien_he'],
+                'email' => $_POST['email_lien_he'],
+                'sl_lon' => $soLon,
+                'sl_tre' => $soTre,
+                'tong_tien' => $tongTien,
+                'ghi_chu' => $_POST['ghi_chu']
+            ];
+
+            $newId = $bookingModel->create($data); 
+
+            if (!$newId) {
+                throw new Exception("Lỗi hệ thống khi lưu đơn hàng.");
+            }
+
+            // 5. Cập nhật số chỗ đã đặt (Cộng thêm vào)
             $lkhModel->updateSoCho($lichId, $tongKhach);
+
+            // 6. Mọi thứ OK -> Commit (Lưu chính thức)
+            $bookingModel->conn->commit();
+
+            // Chuyển trang về danh sách
             header('Location: index.php?action=admin-bookings');
-        } else {
-            echo "Lỗi hệ thống!";
+
+        } catch (Exception $e) {
+            // Nếu có bất kỳ lỗi nào (hết chỗ, lỗi SQL...) -> Rollback (Hoàn tác)
+            $bookingModel->conn->rollBack();
+            
+            // Thông báo lỗi cho người dùng và quay lại trang trước
+            echo "<script>
+                    alert('" . $e->getMessage() . "'); 
+                    window.history.back();
+                  </script>";
         }
     }
 
@@ -129,7 +152,7 @@ class BookingController extends BaseController {
         $bookingModel = new BookingModel();
         
         // 1. Lấy thông tin chi tiết đơn hàng
-        $booking = $bookingModel->getDetail($id); // Hàm này đã có sẵn trong file gốc bạn gửi
+        $booking = $bookingModel->getDetail($id); 
 
         // 2. Lấy lịch sử xử lý
         $history = $bookingModel->getHistory($id);
@@ -145,6 +168,4 @@ class BookingController extends BaseController {
         ]);
     }
 }
-
-
 ?>

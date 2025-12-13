@@ -4,7 +4,8 @@ class GuideModel extends BaseModel
     // Lấy danh sách nhân sự (Có bộ lọc)
     public function getAll($filters = [])
     {
-        $sql = "SELECT * FROM huong_dan_vien WHERE 1=1";
+        // [THAY ĐỔI] Chỉ lấy những bản ghi chưa bị xóa mềm (deleted_at là NULL)
+        $sql = "SELECT * FROM huong_dan_vien WHERE deleted_at IS NULL";
         $params = [];
 
         if (!empty($filters['keyword'])) {
@@ -82,7 +83,9 @@ class GuideModel extends BaseModel
     }
 
     public function delete($id) {
-        $stmt = $this->conn->prepare("DELETE FROM huong_dan_vien WHERE id = :id");
+        // [THAY ĐỔI] Không dùng DELETE nữa, chuyển sang UPDATE thời gian xóa
+        $sql = "UPDATE huong_dan_vien SET deleted_at = NOW() WHERE id = :id";
+        $stmt = $this->conn->prepare($sql);
         return $stmt->execute(['id' => $id]);
     }
 

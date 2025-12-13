@@ -79,6 +79,13 @@ class LichKhoiHanhModel extends BaseModel
         $stmt->execute(['id' => $id]);
         return $stmt->fetch();
     }
+    public function getDetailForUpdate($id) {
+        $sql = "SELECT * FROM lich_khoi_hanh WHERE id = :id FOR UPDATE";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute(['id' => $id]);
+        return $stmt->fetch();
+    }
+
     public function update($id, $data) {
         $sql = "UPDATE lich_khoi_hanh 
                 SET tour_id = :tour_id, 
@@ -111,6 +118,7 @@ class LichKhoiHanhModel extends BaseModel
         return $stmt->fetchAll();
     }
     public function updateSoCho($id, $soLuongKhach) {
+        // Cập nhật số chỗ (có thể cộng hoặc trừ)
         $sql = "UPDATE lich_khoi_hanh 
                 SET so_cho_da_dat = so_cho_da_dat + :so_luong 
                 WHERE id = :id";
@@ -155,7 +163,7 @@ class LichKhoiHanhModel extends BaseModel
         return $stmt->execute(['id' => $id]);
     }
     public function checkStaffAvailability($nhan_vien_id, $startDate, $endDate, $vai_tro) {
-        if ($vai_tro === 'HauCan') return true; // Hậu cần không check trùng
+        if ($vai_tro === 'HauCan') return true; 
 
         $sql = "SELECT COUNT(*) as count 
                 FROM lich_nhan_vien lnv
