@@ -49,20 +49,62 @@ class BookingModel extends BaseModel {
     }
 
     // Cập nhật trạng thái và ghi lịch sử
+    // Cập nhật trạng thái đơn hàng, ghi lịch sử VÀ xử lý số lượng chỗ ngồi
     public function updateStatusAndLog($id, $newStatus, $adminName, $note = '') {
         try {
             $this->conn->beginTransaction();
 
-            // 1. Lấy trạng thái cũ
-            $oldStatus = $this->getStatus($id);
-            if ($oldStatus === $newStatus) return true; // Không đổi thì thôi
+            // 1. Lấy thông tin chi tiết đơn hàng (Cần lấy cả số khách và ID lịch khởi hành)
+            $booking = $this->getDetail($id); 
+            
+            if (!$booking) {
+                // Nếu không tìm thấy đơn hàng thì rollback luôn
+                $this->conn->rollBack();
+                return false;
+            }
 
-            // 2. Update bảng bookings
+            $oldStatus = $booking['trang_thai'];
+            $lichId = $booking['lich_khoi_hanh_id'];
+            // Tổng số khách = Người lớn + Trẻ em
+            $soKhach = (int)$booking['so_nguoi_lon'] + (int)$booking['so_tre_em'];
+
+            // Nếu trạng thái không đổi thì không làm gì cả
+            if ($oldStatus === $newStatus) {
+                $this->conn->commit();
+                return true; 
+            }
+
+            // 2. LOGIC CẬP NHẬT SỐ CHỖ (QUAN TRỌNG)
+            // Cần gọi LichKhoiHanhModel để update số chỗ
+            // Lưu ý: Đảm bảo bạn đã require model này ở đầu file hoặc dùng autoloader
+            $lkhModel = new LichKhoiHanhModel();
+
+            // TRƯỜNG HỢP A: Hủy vé (Khách hủy hoặc Admin hủy)
+            // Logic: Nếu trạng thái mới là 'Huy' VÀ trạng thái cũ KHÔNG PHẢI là 'Huy'
+            // -> Trừ đi số chỗ đã đặt (trả lại chỗ trống cho tour)
+            if ($newStatus === 'Huy' && $oldStatus !== 'Huy') {
+                $lkhModel->updateSoCho($lichId, -($soKhach)); 
+            }
+
+            // TRƯỜNG HỢP B: Khôi phục vé (Từ Hủy -> Sang trạng thái active)
+            // Logic: Nếu trạng thái cũ là 'Huy' VÀ trạng thái mới KHÔNG PHẢI 'Huy'
+            // -> Cộng lại số chỗ. NHƯNG phải check xem còn chỗ không trước.
+            if ($oldStatus === 'Huy' && $newStatus !== 'Huy') {
+                // Kiểm tra xem tour còn đủ chỗ cho nhóm này không
+                if (!$lkhModel->checkSeatAvailability($lichId, $soKhach)) {
+                    // Nếu hết chỗ, ném ra lỗi để catch bắt được và rollback
+                    throw new Exception("Lịch khởi hành này đã hết chỗ, không thể khôi phục booking!");
+                }
+                // Nếu còn chỗ thì cộng vào
+                $lkhModel->updateSoCho($lichId, $soKhach);
+            }
+
+            // 3. Update trạng thái mới vào bảng bookings
             $sql = "UPDATE bookings SET trang_thai = :status WHERE id = :id";
             $stmt = $this->conn->prepare($sql);
             $stmt->execute(['status' => $newStatus, 'id' => $id]);
 
-            // 3. Ghi log vào booking_history
+            // 4. Ghi log vào booking_history
             $sqlHistory = "INSERT INTO booking_history (booking_id, nguoi_thay_doi, trang_thai_cu, trang_thai_moi, ghi_chu_thay_doi) 
                            VALUES (:id, :admin, :old, :new, :note)";
             $stmtHistory = $this->conn->prepare($sqlHistory);
@@ -78,6 +120,7 @@ class BookingModel extends BaseModel {
             return true;
         } catch (Exception $e) {
             $this->conn->rollBack();
+            // Có thể log lỗi ra file nếu cần: error_log($e->getMessage());
             return false;
         }
     }

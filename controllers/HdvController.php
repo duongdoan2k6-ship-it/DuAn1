@@ -4,15 +4,11 @@ class HdvController extends BaseController
     private $nhatKyModel;
     private $diemDanhModel;
 
-    public function __construct()
-    {
+    public function __construct(){
         $this->nhatKyModel = new NhatKyTourModel();
         $this->diemDanhModel = new DiemDanhModel();
     }
-
-    // Trang danh sách tour (Dashboard)
-    public function index()
-    {
+    public function index(){
         if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'hdv') {
             header('Location: ' . BASE_URL . 'routes/index.php?action=login');
             exit;
@@ -24,10 +20,7 @@ class HdvController extends BaseController
 
         $this->render('pages/hdv/dashboard', ['myTours' => $myTours]);
     }
-
-    // Xem chi tiết tour: Khách, Lịch trình, Nhật ký, Phiên điểm danh
-    public function detail()
-    {
+    public function detail(){
         if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'hdv') {
             header('Location: ' . BASE_URL . 'routes/index.php?action=login');
             exit;
@@ -66,10 +59,7 @@ class HdvController extends BaseController
             'lichId'            => $lichId
         ]);
     }
-
-    // Xử lý lưu điểm danh nhanh (Logic cũ - Giữ lại để tương thích)
-    public function checkIn()
-    {
+    public function checkIn(){
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $lichId = $_POST['lich_id'];
             $attendanceData = $_POST['attendance'] ?? [];
@@ -84,14 +74,7 @@ class HdvController extends BaseController
             header('Location: ' . BASE_URL . 'routes/index.php?action=hdv-tour-detail&id=' . $lichId . '&status=success');
         }
     }
-
-    // ====================================================================
-    // CÁC HÀM XỬ LÝ NHẬT KÝ
-    // ====================================================================
-
-    // Xử lý thêm nhật ký tour
-    public function addNhatKy()
-    {
+    public function addNhatKy(){
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $lichId = $_POST['lich_khoi_hanh_id'];
 
@@ -129,10 +112,7 @@ class HdvController extends BaseController
             exit;
         }
     }
-
-    // Hiển thị form sửa nhật ký
-    public function editNhatKy()
-    {
+    public function editNhatKy(){
         if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'hdv') {
             die('Không có quyền truy cập');
         }
@@ -146,10 +126,7 @@ class HdvController extends BaseController
 
         $this->render('pages/hdv/edit_nhat_ky', ['log' => $log]);
     }
-
-    // Xử lý cập nhật nhật ký
-    public function updateNhatKy()
-    {
+    public function updateNhatKy(){
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $id = $_POST['id'];
             $lichId = $_POST['lich_khoi_hanh_id'];
@@ -185,10 +162,7 @@ class HdvController extends BaseController
             exit;
         }
     }
-
-    // Xử lý xóa nhật ký
-    public function deleteNhatKy()
-    {
+    public function deleteNhatKy(){
         $id = $_GET['id'] ?? 0;
         $lichId = $_GET['lich_id'] ?? 0;
 
@@ -205,14 +179,7 @@ class HdvController extends BaseController
         header('Location: ' . BASE_URL . 'routes/index.php?action=hdv-tour-detail&id=' . $lichId . '&status=delete_success');
         exit;
     }
-
-    // ====================================================================
-    // CÁC HÀM XỬ LÝ ĐIỂM DANH CHI TIẾT (MỚI)
-    // ====================================================================
-
-    // 1. Tạo Phiên điểm danh mới
-    public function createPhienDiemDanh()
-    {
+    public function createPhienDiemDanh(){
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $lichId = $_POST['lich_khoi_hanh_id'];
             $tieuDe = trim($_POST['tieu_de'] ?? '');
@@ -232,10 +199,7 @@ class HdvController extends BaseController
             exit;
         }
     }
-
-    // 2. Xem chi tiết 1 phiên điểm danh (và hiển thị form điểm danh)
-    public function viewDiemDanh()
-    {
+    public function viewDiemDanh(){
         if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'hdv') {
             header('Location: ' . BASE_URL . 'routes/index.php?action=login');
             exit;
@@ -265,10 +229,7 @@ class HdvController extends BaseController
             'phienId'    => $phienId
         ]);
     }
-
-    // 3. Xử lý lưu trạng thái điểm danh chi tiết
-    public function saveDiemDanh()
-    {
+    public function saveDiemDanh(){
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $lichId = $_POST['lich_id'];
             $phienId = $_POST['phien_id'];
@@ -289,10 +250,7 @@ class HdvController extends BaseController
             exit;
         }
     }
-
-    // 4. Xóa phiên điểm danh
-    public function deletePhienDiemDanh()
-    {
+    public function deletePhienDiemDanh(){
         $phienId = $_GET['phien_id'] ?? 0;
         $lichId = $_GET['lich_id'] ?? 0;
 
@@ -301,21 +259,12 @@ class HdvController extends BaseController
         header('Location: ' . BASE_URL . 'routes/index.php?action=hdv-tour-detail&id=' . $lichId . '&status=phien_deleted');
         exit;
     }
-
-    // ====================================================================
-    // CÁC HÀM XỬ LÝ NHU CẦU ĐẶC BIỆT CỦA KHÁCH (MỚI)
-    // ====================================================================
-
-    // [MỚI] Xử lý cập nhật yêu cầu đặc biệt của khách
-    public function updateYeuCauDacBiet()
-    {
+    public function updateYeuCauDacBiet(){
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $lichId = $_POST['lich_id'] ?? 0;
             $khachId = $_POST['khach_id'] ?? 0;
-            $ghiChu = trim($_POST['ghi_chu'] ?? ''); // Lấy nội dung ghi chú
-
+            $ghiChu = trim($_POST['ghi_chu'] ?? '');
             if ($khachId == 0 || $lichId == 0) {
-                // Xử lý lỗi thiếu tham số
                 header('Location: ' . BASE_URL . 'routes/index.php?action=hdv-tour-detail&id=' . $lichId . '&status=note_error_param');
                 exit;
             }
@@ -326,9 +275,6 @@ class HdvController extends BaseController
             } else {
                 $status = 'note_error';
             }
-
-            // Quay lại tab Khách hàng của trang chi tiết tour
-            // Thêm hash #v-pills-passengers-tab để tự động mở tab Khách hàng
             header('Location: ' . BASE_URL . 'routes/index.php?action=hdv-tour-detail&id=' . $lichId . '&status=' . $status . '#v-pills-passengers-tab');
             exit;
         }

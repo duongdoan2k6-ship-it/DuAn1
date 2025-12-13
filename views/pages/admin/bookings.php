@@ -100,8 +100,20 @@
 
                                     <?php elseif ($b['trang_thai'] === 'DaXacNhan'): ?>
                                         <a href="<?= BASE_URL ?>routes/index.php?action=booking-status&id=<?= $b['id'] ?>&status=DaThanhToan" 
-                                           class="btn btn-sm btn-primary" title="Xác nhận thanh toán">
+                                           class="btn btn-sm btn-primary me-1" title="Xác nhận thanh toán">
                                            <i class="fas fa-dollar-sign"></i> Thu tiền
+                                        </a>
+                                        <a href="<?= BASE_URL ?>routes/index.php?action=booking-status&id=<?= $b['id'] ?>&status=Huy" 
+                                           class="btn btn-sm btn-danger" title="Hủy đơn"
+                                           onclick="return confirm('Khách đã xác nhận nhưng muốn hủy? Hủy đơn này sẽ trả lại chỗ trống.')">
+                                           <i class="fas fa-times"></i>
+                                        </a>
+
+                                    <?php elseif ($b['trang_thai'] === 'Huy'): ?>
+                                        <a href="<?= BASE_URL ?>routes/index.php?action=booking-status&id=<?= $b['id'] ?>&status=ChoXacNhan" 
+                                           class="btn btn-sm btn-warning text-dark" title="Khôi phục đơn hàng"
+                                           onclick="return confirm('Khôi phục đơn hàng này? Hệ thống sẽ kiểm tra xem Tour còn chỗ trống không.')">
+                                           <i class="fas fa-undo"></i> Khôi phục
                                         </a>
                                     <?php endif; ?>
                                 </td>

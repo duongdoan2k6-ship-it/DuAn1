@@ -16,14 +16,17 @@ class BookingController extends BaseController {
 
     // --- [ĐÃ SỬA] Xử lý đổi trạng thái & Ghi lịch sử ---
     public function updateStatus() {
-        if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') exit;
+        // 1. Kiểm tra quyền Admin
+        if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
+            header('Location: ' . BASE_URL . 'routes/index.php?action=login');
+            exit;
+        }
 
         $id = $_GET['id'] ?? 0;
         $status = $_GET['status'] ?? '';
 
-        // Lấy tên admin đang đăng nhập để ghi vào lịch sử
-        // (Nếu session của bạn lưu tên trường khác, hãy sửa 'ho_ten' thành tên đó)
-        $adminName = $_SESSION['ho_ten'] ?? 'Administrator'; 
+        // 2. Lấy tên admin từ Session (Dựa vào AuthController: $_SESSION['user'] chứa thông tin admin)
+        $adminName = $_SESSION['user']['ho_ten'] ?? 'Administrator'; 
 
         // Các trạng thái hợp lệ
         $validStatus = ['ChoXacNhan', 'DaXacNhan', 'DaThanhToan', 'Huy'];
@@ -34,11 +37,26 @@ class BookingController extends BaseController {
             // Ghi chú mặc định khi click nhanh
             $note = "Cập nhật nhanh từ trang danh sách";
             
-            // Gọi hàm mới updateStatusAndLog (đã thêm vào Model ở Bước 3.1)
-            $bookingModel->updateStatusAndLog($id, $status, $adminName, $note);
+            // 3. GỌI HÀM MODEL VÀ KIỂM TRA KẾT QUẢ
+            // Hàm updateStatusAndLog trả về true (thành công) hoặc false (thất bại/hết chỗ)
+            $result = $bookingModel->updateStatusAndLog($id, $status, $adminName, $note);
+
+            if ($result) {
+                // Thành công: Quay lại trang danh sách
+                header('Location: ' . BASE_URL . 'routes/index.php?action=admin-bookings');
+                exit;
+            } else {
+                // Thất bại (Thường là do Tour hết chỗ khi cố gắng khôi phục vé Hủy)
+                // Sử dụng JS để Alert rồi mới chuyển trang
+                echo "<script>
+                        alert('KHÔNG THỂ CẬP NHẬT TRẠNG THÁI!\\n\\nNguyên nhân có thể:\\n1. Tour đã hết chỗ trống (khi bạn khôi phục vé Hủy).\\n2. Lỗi hệ thống.');
+                        window.location.href = '" . BASE_URL . "routes/index.php?action=admin-bookings';
+                      </script>";
+                exit;
+            }
         }
 
-        // Quay lại trang danh sách
+        // Trường hợp tham số không hợp lệ, quay về danh sách
         header('Location: ' . BASE_URL . 'routes/index.php?action=admin-bookings');
     }
 
