@@ -191,7 +191,6 @@ class TourController extends BaseController {
     }
 }
 
-// Hàm helper upload ảnh
 function this_upload_image($file) {
     $targetDir = "public/assets/uploads/";
     $fileName = time() . "_" . basename($file["name"]);
@@ -201,7 +200,5 @@ function this_upload_image($file) {
     return "default.jpg";
 }
 
-
-// Xem chi tiết booking và lịch sử
     
 ?>

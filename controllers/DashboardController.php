@@ -32,10 +32,7 @@ class DashboardController extends BaseController
         }
 
         $lichModel = new LichKhoiHanhModel();
-        
-        // Lấy dữ liệu cho dropdown
         $tours = $lichModel->getAllToursList();
-        // $guides vẫn giữ để view cũ không lỗi, nhưng logic xử lý sẽ bỏ qua
         $guides = $lichModel->getAllHDVList(); 
 
         $this->render('pages/admin/form_them_lich', [
@@ -44,7 +41,7 @@ class DashboardController extends BaseController
         ]);
     }
 
-    // 2. Xử lý lưu dữ liệu (ĐÃ CẬP NHẬT: Bỏ logic HDV cũ)
+    // 2. Xử lý lưu dữ liệu
     public function store() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $lichModel = new LichKhoiHanhModel();
@@ -53,8 +50,11 @@ class DashboardController extends BaseController
             $ngay_di = $_POST['ngay_khoi_hanh'];
             $ngay_ve = $_POST['ngay_ket_thuc'];
 
-            // Lưu ý: Logic chọn HDV ở đây đã được loại bỏ để chuyển sang module "Phân bổ nhân sự"
-            // Ta chỉ tạo khung lịch trình trước.
+            // [FIX] Validate Ngày: Ngày về không được trước ngày đi
+            if (strtotime($ngay_ve) < strtotime($ngay_di)) {
+                echo "<script>alert('Lỗi: Ngày kết thúc phải sau hoặc bằng Ngày khởi hành!'); window.history.back();</script>";
+                return;
+            }
 
             $data = [
                 'tour_id' => $tour_id,
@@ -65,7 +65,6 @@ class DashboardController extends BaseController
             ];
 
             if ($lichModel->insert($data)) {
-                // Sau khi tạo lịch xong, redirect về Dashboard kèm thông báo
                 header('Location: ' . BASE_URL . 'routes/index.php?action=admin-dashboard&msg=success');
             } else {
                 echo "Lỗi khi thêm mới!";
@@ -96,21 +95,45 @@ class DashboardController extends BaseController
         ]);
     }
 
-    // 4. Xử lý cập nhật (ĐÃ CẬP NHẬT: Bỏ logic HDV cũ)
+    // 4. Xử lý cập nhật (ĐÃ FIX: Thêm Logic An Toàn)
     public function update() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $id = $_GET['id'] ?? 0;
+            $lichModel = new LichKhoiHanhModel();
+
+            // Lấy dữ liệu từ form
+            $ngay_di = $_POST['ngay_khoi_hanh'];
+            $ngay_ve = $_POST['ngay_ket_thuc'];
+            $so_cho_moi = (int)$_POST['so_cho_toi_da'];
+
+            // [FIX 1] Validate Ngày
+            if (strtotime($ngay_ve) < strtotime($ngay_di)) {
+                echo "<script>alert('Lỗi: Ngày kết thúc phải sau hoặc bằng Ngày khởi hành!'); window.history.back();</script>";
+                return;
+            }
+
+            // [FIX 2] Validate Số chỗ: Không được giảm thấp hơn số khách đã đặt
+            $currentLich = $lichModel->getDetail($id);
+            if ($currentLich) {
+                $so_da_dat = (int)$currentLich['so_cho_da_dat'];
+                if ($so_cho_moi < $so_da_dat) {
+                    echo "<script>
+                        alert('KHÔNG THỂ CẬP NHẬT!\\n\\nSố chỗ mới ($so_cho_moi) nhỏ hơn số khách đã đặt ($so_da_dat).\\nVui lòng hủy bớt vé trước khi giảm số chỗ.');
+                        window.history.back();
+                    </script>";
+                    return;
+                }
+            }
             
             $data = [
                 'tour_id' => $_POST['tour_id'],
-                'ngay_khoi_hanh' => $_POST['ngay_khoi_hanh'],
-                'ngay_ket_thuc' => $_POST['ngay_ket_thuc'],
-                'so_cho_toi_da' => $_POST['so_cho_toi_da'],
-                'diem_tap_trung' => $_POST['diem_tap_trung'],
+                'ngay_khoi_hanh' => $ngay_di,
+                'ngay_ket_thuc' => $ngay_ve,
+                'so_cho_toi_da' => $so_cho_moi,
+                'diem_tap_trung' => $_POST['diem_tap_trung'], // Cần đảm bảo View có input name này
                 'trang_thai' => $_POST['trang_thai']
             ];
 
-            $lichModel = new LichKhoiHanhModel();
             if ($lichModel->update($id, $data)) {
                 header('Location: ' . BASE_URL . 'routes/index.php?action=admin-dashboard&msg=updated');
             } else {
@@ -119,7 +142,7 @@ class DashboardController extends BaseController
         }
     }
 
-    // 5. Xóa lịch
+    // 5. Xóa lịch (ĐÃ FIX: Chặn xóa nếu có khách)
     public function delete() {
         if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
             header('Location: ' . BASE_URL . 'routes/index.php?action=login');
@@ -129,6 +152,17 @@ class DashboardController extends BaseController
         $id = $_GET['id'] ?? 0;
         if ($id) {
             $lichModel = new LichKhoiHanhModel();
+            
+            // [FIX] Kiểm tra xem tour này có khách không
+            $lich = $lichModel->getDetail($id);
+            if ($lich && $lich['so_cho_da_dat'] > 0) {
+                 echo "<script>
+                    alert('CẢNH BÁO: Không thể xóa lịch trình này!\\n\\nĐang có " . $lich['so_cho_da_dat'] . " khách đã đặt tour. Xóa sẽ làm mất dữ liệu quan trọng.');
+                    window.location.href = '" . BASE_URL . "routes/index.php?action=admin-dashboard';
+                </script>";
+                exit;
+            }
+
             if ($lichModel->delete($id)) {
                 header('Location: ' . BASE_URL . 'routes/index.php?action=admin-dashboard&msg=deleted');
             } else {
@@ -139,6 +173,9 @@ class DashboardController extends BaseController
         }
     }
 
+    // ... (Giữ nguyên các hàm services, storeService, updateService, deleteService, staffAssignment, storeStaff, deleteStaff phía dưới) ...
+    // Bạn chỉ cần copy đè phần trên của file cũ là được.
+    
     // ==========================================================
     // MODULE QUẢN LÝ DỊCH VỤ (ĐIỀU HÀNH) - Giữ nguyên
     // ==========================================================
@@ -242,7 +279,6 @@ class DashboardController extends BaseController
     // MODULE MỚI: QUẢN LÝ PHÂN BỔ NHÂN SỰ (HDV, TÀI XẾ...)
     // ==========================================================
 
-    // 1. Hiển thị trang phân bổ
     public function staffAssignment() {
         if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') exit;
 
@@ -268,7 +304,6 @@ class DashboardController extends BaseController
         ]);
     }
 
-    // 2. Xử lý lưu phân bổ
     public function storeStaff() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $lichModel = new LichKhoiHanhModel();
@@ -296,7 +331,6 @@ class DashboardController extends BaseController
             }
 
             // B. Kiểm tra logic nghiệp vụ
-            
             // Logic 1: Kiểm tra trùng lịch (Chỉ áp dụng cho HDV và Tài Xế)
             if ($staffInfo['phan_loai_nhan_su'] !== 'HauCan') {
                 $isFree = $lichModel->checkStaffAvailability(
@@ -312,7 +346,6 @@ class DashboardController extends BaseController
                 }
             }
 
-            // Logic 2: Mỗi chuyến chỉ có 1 HDV Chính
             if ($vaiTro === 'HDV_chinh') {
                 $assigned = $lichModel->getAssignedStaff($lichId);
                 foreach ($assigned as $a) {
@@ -323,7 +356,6 @@ class DashboardController extends BaseController
                 }
             }
 
-            // C. Lưu vào DB
             if ($lichModel->assignStaff($lichId, $nhanVienId, $vaiTro)) {
                 header('Location: ' . BASE_URL . 'routes/index.php?action=admin-schedule-staff&id=' . $lichId . '&msg=assigned');
             } else {
@@ -332,10 +364,9 @@ class DashboardController extends BaseController
         }
     }
 
-    // 3. Xóa phân bổ
     public function deleteStaff() {
-        $id = $_GET['id'];       // ID bảng phân bổ
-        $lichId = $_GET['lich_id']; // Để quay lại trang cũ
+        $id = $_GET['id'];
+        $lichId = $_GET['lich_id'];
 
         $lichModel = new LichKhoiHanhModel();
         $lichModel->unassignStaff($id);
