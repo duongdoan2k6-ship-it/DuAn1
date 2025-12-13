@@ -11,19 +11,26 @@
     <div class="row justify-content-center">
         <div class="col-md-8">
             <div class="card shadow">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">Thêm Đối Tác Mới</h5>
+                <div class="card-header bg-success text-white fw-bold">
+                    ➕ Thêm Đối Tác Mới
                 </div>
                 <div class="card-body p-4">
                     <form action="index.php?action=admin-supplier-store" method="POST">
                         <div class="mb-3">
-                            <label class="form-label fw-bold">Tên Nhà Cung Cấp</label>
+                            <label class="form-label fw-bold">Tên Nhà Cung Cấp <span class="text-danger">*</span></label>
                             <input type="text" name="ten_ncc" class="form-control" required placeholder="Ví dụ: Khách sạn Mường Thanh, Xe du lịch ABC...">
                         </div>
                         
                         <div class="mb-3">
-                            <label class="form-label fw-bold">Loại Dịch Vụ</label>
-                            <input type="text" name="dich_vu" class="form-control" required placeholder="Ví dụ: Lưu trú, Vận chuyển, Nhà hàng...">
+                            <label class="form-label fw-bold">Loại Dịch Vụ <span class="text-danger">*</span></label>
+                            <select name="dich_vu" class="form-select" required>
+                                <option value="">-- Chọn loại dịch vụ --</option>
+                                <option value="Lưu trú">Lưu trú (Khách sạn/Resort)</option>
+                                <option value="Vận chuyển">Vận chuyển (Xe/Tàu/Bay)</option>
+                                <option value="Ăn uống">Ăn uống (Nhà hàng)</option>
+                                <option value="Vé Tham Quan">Vé Tham Quan</option>
+                                <option value="Khác">Khác</option>
+                            </select>
                         </div>
 
                         <div class="row">
@@ -43,8 +50,8 @@
                         </div>
 
                         <div class="text-end border-top pt-3">
-                            <a href="index.php?action=admin-suppliers" class="btn btn-secondary">Hủy</a>
-                            <button type="submit" class="btn btn-primary px-4">Lưu Thông Tin</button>
+                            <a href="index.php?action=admin-suppliers" class="btn btn-secondary">Hủy bỏ</a>
+                            <button type="submit" class="btn btn-success px-4 fw-bold">Lưu Thông Tin</button>
                         </div>
                     </form>
                 </div>
