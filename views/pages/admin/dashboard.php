@@ -121,6 +121,52 @@
                                 </tr>
                             <?php else: ?>
                                 <?php foreach ($listTours as $tour): ?>
+                                    <?php
+                                    // --- 1. TÍNH TOÁN THỜI GIAN ---
+                                    $currentTime = time();
+                                    $startTime   = strtotime($tour['ngay_khoi_hanh']);
+                                    $endTime     = strtotime($tour['ngay_ket_thuc']);
+
+                                    // --- 2. CÁC CỜ KIỂM TRA TRẠNG THÁI ---
+
+                                    // Check 1: Đã huỷ (Dựa vào DB)
+                                    $isCancelled = ($tour['trang_thai'] === 'Huy');
+
+                                    // Check 2: Đang đi (Hiện tại nằm giữa Khởi hành và Kết thúc)
+                                    $isOngoing   = ($currentTime >= $startTime && $currentTime <= $endTime);
+
+                                    // Check 3: Hoàn thành (Hiện tại lớn hơn ngày Kết thúc)
+                                    $isFinished  = ($currentTime > $endTime);
+
+                                    // Check 4: Đã đầy (Số chỗ đặt >= tối đa)
+                                    $isFull      = ($tour['so_cho_da_dat'] >= $tour['so_cho_toi_da']);
+
+                                    // --- 3. QUYẾT ĐỊNH HIỂN THỊ TRẠNG THÁI (Theo thứ tự ưu tiên) ---
+                                    if ($isCancelled) {
+                                        $badgeConfig = ['bg' => 'secondary', 'label' => 'Đã hủy'];
+                                    } elseif ($isOngoing) {
+                                        // Logic mới bạn yêu cầu
+                                        $badgeConfig = ['bg' => 'primary', 'label' => 'Đang đi'];
+                                        // Có thể thêm hiệu ứng nhấp nháy (class spinner) nếu muốn
+                                    } elseif ($isFinished) {
+                                        $badgeConfig = ['bg' => 'dark', 'label' => 'Hoàn thành'];
+                                    } elseif ($isFull) {
+                                        $badgeConfig = ['bg' => 'danger', 'label' => 'Đã đầy'];
+                                    } else {
+                                        // Trạng thái mặc định (thường là "Đang nhận khách")
+                                        $badgeConfig = ['bg' => 'success', 'label' => 'Đang nhận khách'];
+                                    }
+
+                                    // --- 4. PHÂN QUYỀN HÀNH ĐỘNG ---
+
+                                    // Được Sửa/Hủy khi: Chưa bắt đầu VÀ Chưa hủy
+                                    // (Lưu ý: Đang đi ($isOngoing) cũng không được sửa/hủy để bảo toàn dữ liệu)
+                                    $canEditOrCancel = ($currentTime < $startTime && !$isCancelled);
+
+                                    // Được Xóa khi: Đã hoàn thành (xong tour) HOẶC Đã hủy
+                                    // (Lưu ý: Đang đi không được xóa)
+                                    $canDelete = ($isFinished || $isCancelled);
+                                    ?>
                                     <tr>
                                         <td class="text-center fw-bold text-muted">#<?= $tour['id'] ?></td>
 
@@ -133,8 +179,8 @@
                                         </td>
 
                                         <td class="text-center small">
-                                            <div><i class="fas fa-plane-departure text-primary"></i> <?php echo date('d/m/Y H:i', strtotime($tour['ngay_khoi_hanh'])); ?></div>
-                                            <div><i class="fas fa-plane-arrival text-success"></i> <?php echo date('d/m/Y H:i', strtotime($tour['ngay_ket_thuc'])); ?></div>
+                                            <div><i class="fas fa-plane-departure text-primary"></i> <?php echo date('d/m/Y H:i', $startTime); ?></div>
+                                            <div><i class="fas fa-plane-arrival text-success"></i> <?php echo date('d/m/Y H:i', $endTime); ?></div>
                                         </td>
 
                                         <td class="text-center">
@@ -159,18 +205,8 @@
                                         </td>
 
                                         <td class="text-center">
-                                            <?php
-                                            $statusColors = [
-                                                'NhanKhach' => ['bg' => 'success', 'label' => 'Đang nhận khách'],
-                                                'DaDay'     => ['bg' => 'danger',  'label' => 'Đã đầy'],
-                                                'DangDi'    => ['bg' => 'primary', 'label' => 'Đang đi'],
-                                                'HoanThanh' => ['bg' => 'dark',    'label' => 'Hoàn thành'],
-                                                'Huy'       => ['bg' => 'secondary', 'label' => 'Đã hủy'],
-                                            ];
-                                            $stt = $tour['trang_thai'];
-                                            $badgeConfig = $statusColors[$stt] ?? ['bg' => 'secondary', 'label' => $stt];
-                                            ?>
                                             <span class="badge bg-<?= $badgeConfig['bg'] ?>">
+                                                <?php if ($isOngoing): ?> <i class="fas fa-plane"></i> <?php endif; ?>
                                                 <?= $badgeConfig['label'] ?>
                                             </span>
                                         </td>
@@ -179,19 +215,37 @@
                                             <div class="btn-group" role="group">
                                                 <a href="<?= BASE_URL ?>routes/index.php?action=admin-lich-detail&id=<?= $tour['id'] ?>"
                                                     class="btn btn-sm btn-outline-info" title="Danh sách khách">
-                                                    Chi tiết
+                                                    <i class="fas fa-eye"></i>
                                                 </a>
 
-                                                <a href="<?= BASE_URL ?>routes/index.php?action=admin-schedule-staff&id=<?= $tour['id'] ?>"
-                                                    class="btn btn-sm btn-outline-warning text-dark" title="Sửa & Phân bổ Nhân sự">
-                                                    Sửa / Phân công
-                                                </a>
+                                                <?php if ($canEditOrCancel): ?>
+                                                    <a href="<?= BASE_URL ?>routes/index.php?action=admin-schedule-staff&id=<?= $tour['id'] ?>"
+                                                        class="btn btn-sm btn-outline-primary" title="Sửa & Phân bổ">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
 
-                                                <a href="<?= BASE_URL ?>routes/index.php?action=admin-delete-lich&id=<?= $tour['id'] ?>"
-                                                    class="btn btn-sm btn-outline-danger" title="Xóa lịch"
-                                                    onclick="return confirm('CẢNH BÁO: Xóa lịch trình này sẽ xóa toàn bộ booking liên quan. Bạn có chắc chắn không?')">
-                                                    Xóa
-                                                </a>
+                                                    <a href="<?= BASE_URL ?>routes/index.php?action=admin-cancel-tour&id=<?= $tour['id'] ?>"
+                                                        class="btn btn-sm btn-outline-warning text-dark" title="Hủy chuyến đi này"
+                                                        onclick="return confirm('Bạn có chắc chắn muốn HỦY chuyến đi này?')">
+                                                        <i class="fas fa-ban"></i> Hủy
+                                                    </a>
+                                                <?php else: ?>
+                                                    <button class="btn btn-sm btn-light text-muted" disabled style="cursor: not-allowed;" title="Không thể sửa/hủy khi tour đang đi hoặc đã kết thúc">
+                                                        <i class="fas fa-lock"></i>
+                                                    </button>
+                                                <?php endif; ?>
+
+                                                <?php if ($canDelete): ?>
+                                                    <a href="<?= BASE_URL ?>routes/index.php?action=admin-delete-lich&id=<?= $tour['id'] ?>"
+                                                        class="btn btn-sm btn-outline-danger" title="Xóa lịch sử dụng"
+                                                        onclick="return confirm('CẢNH BÁO: Bạn đang xóa một lịch trình ĐÃ KẾT THÚC. Dữ liệu booking sẽ mất. Tiếp tục?')">
+                                                        <i class="fas fa-trash-alt"></i>
+                                                    </a>
+                                                <?php else: ?>
+                                                    <button class="btn btn-sm btn-secondary" disabled title="Chỉ xóa được tour đã kết thúc hoặc đã hủy">
+                                                        <i class="fas fa-trash-alt"></i>
+                                                    </button>
+                                                <?php endif; ?>
                                             </div>
                                         </td>
                                     </tr>
