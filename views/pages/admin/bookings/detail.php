@@ -38,19 +38,7 @@
                         </div>
                     <?php endif; ?>
                     
-                    <hr>
-                    <div class="d-flex gap-2">
-                        <a href="<?= BASE_URL ?>routes/index.php?action=booking-status&id=<?= $booking['id'] ?>&status=DaXacNhan" class="btn btn-sm btn-info text-white">
-                            <i class="fas fa-check"></i> Xác nhận
-                        </a>
-                        <a href="<?= BASE_URL ?>routes/index.php?action=booking-status&id=<?= $booking['id'] ?>&status=DaThanhToan" class="btn btn-sm btn-success">
-                            <i class="fas fa-dollar-sign"></i> Đã Thanh Toán
-                        </a>
-                        <a href="<?= BASE_URL ?>routes/index.php?action=booking-status&id=<?= $booking['id'] ?>&status=Huy" class="btn btn-sm btn-danger" onclick="return confirm('Bạn chắc chắn muốn hủy đơn này?')">
-                            <i class="fas fa-times"></i> Hủy đơn
-                        </a>
                     </div>
-                </div>
             </div>
 
             <div class="card shadow-sm">
