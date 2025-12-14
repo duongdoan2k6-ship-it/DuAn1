@@ -30,33 +30,31 @@ class HdvController extends BaseController
         $lichModel = new LichKhoiHanhModel();
         $khachModel = new KhachTourModel();
 
-        // 1. Lấy thông tin chi tiết chuyến đi
         $tourInfo = $lichModel->getDetailForHdv($lichId);
 
         if (!$tourInfo) {
             die("Không tìm thấy thông tin chuyến đi!");
         }
-
-        // 2. Lấy danh sách khách hàng
+        
         $passengers = $khachModel->getPassengersByTour($lichId);
-
-        // 3. Lấy lịch trình chi tiết (dự kiến)
         $itineraries = $lichModel->getTourItinerary($tourInfo['tour_id']);
-
-        // 4. Lấy danh sách nhật ký tour (thực tế)
         $nhatKyList = $this->nhatKyModel->getLogsByLichId($lichId);
-
-        // 5. [MỚI] Lấy danh sách các phiên điểm danh
         $phienDiemDanhList = $this->diemDanhModel->getPhienByLich($lichId);
 
-        // Truyền tất cả sang view
+        $now = time();
+        $start = strtotime($tourInfo['ngay_khoi_hanh']);
+        $end = strtotime($tourInfo['ngay_ket_thuc']);
+
+        $isEditable = ($now >= $start && $now <= $end);
+
         $this->render('pages/hdv/tour_detail', [
             'tourInfo'          => $tourInfo,
             'passengers'        => $passengers,
             'itineraries'       => $itineraries,
             'nhatKyList'        => $nhatKyList,
-            'phienDiemDanhList' => $phienDiemDanhList, // Truyền biến này sang view
-            'lichId'            => $lichId
+            'phienDiemDanhList' => $phienDiemDanhList, 
+            'lichId'            => $lichId,
+            'isEditable'            => $isEditable
         ]);
     }
     public function checkIn(){

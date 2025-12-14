@@ -4,14 +4,24 @@ class DiemDanhModel extends BaseModel
     // 1. Lấy danh sách các phiên của 1 lịch trình
     public function getPhienByLich($lichId)
     {
-        $sql = "SELECT * FROM phien_diem_danh WHERE lich_khoi_hanh_id = :id ORDER BY thoi_gian_tao DESC";
+        // Sửa câu SQL để đếm số người
+        $sql = "SELECT p.*, 
+                       COUNT(ct.khach_id) as tong_so,
+                       SUM(CASE WHEN ct.trang_thai = 1 THEN 1 ELSE 0 END) as co_mat
+                FROM phien_diem_danh p
+                LEFT JOIN chi_tiet_diem_danh ct ON p.id = ct.phien_id
+                WHERE p.lich_khoi_hanh_id = :id 
+                GROUP BY p.id
+                ORDER BY p.thoi_gian_tao DESC";
+
         $stmt = $this->conn->prepare($sql);
         $stmt->execute(['id' => $lichId]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     // 2. Lấy chi tiết khách và trạng thái điểm danh trong 1 phiên
-    public function getChiTietPhien($phienId, $lichId) {
+    public function getChiTietPhien($phienId, $lichId)
+    {
         $sql = "
             SELECT 
                 k.id AS khach_id, 
@@ -29,7 +39,7 @@ class DiemDanhModel extends BaseModel
             AND b.trang_thai IN ('DaXacNhan', 'DaThanhToan')
             ORDER BY k.id
         ";
-        
+
         $stmt = $this->conn->prepare($sql);
         $stmt->execute([
             'phien_id' => $phienId,
@@ -71,10 +81,9 @@ class DiemDanhModel extends BaseModel
                     $stmtInsert->execute(['pid' => $phienId, 'kid' => $k['id']]);
                 }
             }
-            
+
             $this->conn->commit(); // Lưu tất cả
             return $phienId;
-
         } catch (Exception $e) {
             $this->conn->rollBack(); // Hoàn tác nếu lỗi
             return false;
@@ -116,4 +125,3 @@ class DiemDanhModel extends BaseModel
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 }
-?>
