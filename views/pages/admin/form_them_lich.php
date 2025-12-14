@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <title>Thêm Lịch Khởi Hành</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/confirmDate/confirmDate.css">
 </head>
@@ -30,7 +31,7 @@
                         <a href="<?= BASE_URL ?>routes/index.php?action=admin-dashboard" class="btn btn-sm btn-light">Quay lại</a>
                     </div>
                     <div class="card-body">
-                        <form action="<?= BASE_URL ?>routes/index.php?action=admin-store-lich" method="POST">
+                        <form id="formLich" action="<?= BASE_URL ?>routes/index.php?action=admin-store-lich" method="POST">
 
                             <div class="row">
                                 <div class="col-md-6 border-end">
@@ -50,7 +51,7 @@
 
                                     <div class="row">
                                         <div class="col-md-6 mb-3">
-                                            <label class="fw-bold">Ngày Giờ Khởi Hành</label>
+                                            <label class="fw-bold">Ngày Giờ Khởi Hành <span class="text-danger">*</span></label>
                                             <small class="text-muted d-block mb-1">(Phải cách hôm nay ít nhất 3 ngày)</small>
                                             <input type="text" id="ngay_khoi_hanh" name="ngay_khoi_hanh"
                                                 class="form-control datetimepicker" placeholder="Chọn ngày đi..." required>
@@ -60,7 +61,7 @@
                                             <small class="text-muted d-block mb-1">(Tự động tính toán)</small>
                                             <input type="text" id="ngay_ket_thuc" name="ngay_ket_thuc"
                                                 class="form-control datetimepicker"
-                                                placeholder="Chọn tour và ngày đi..."
+                                                placeholder=""
                                                 style="background-color: #e9ecef; cursor: not-allowed;"
                                                 readonly required>
                                         </div>
@@ -82,19 +83,19 @@
 
                                 <div class="col-md-6">
                                     <h5 class="text-primary border-bottom pb-2">2. Phân Bổ Nhân Sự</h5>
+                                    
+                                    <div class="alert alert-info py-2" style="font-size: 0.9rem;">
+                                        <i class="bi bi-info-circle"></i> Vui lòng chọn ngày khởi hành trước.
+                                    </div>
 
                                     <div class="mb-3">
                                         <label class="fw-bold text-success">Hướng Dẫn Viên (Chính)</label>
-                                        <select name="hdv_id" class="form-select" required>
-                                            <option value="">-- Chọn Hướng Dẫn Viên --</option>
-                                            <?php
-                                            // Sử dụng biến $listHDV được truyền từ Controller (hoặc lọc từ $guides nếu chưa sửa controller)
-                                            $sourceHDV = isset($listHDV) ? $listHDV : ($guides ?? []);
-                                            foreach ($sourceHDV as $g):
-                                                // Chỉ hiện HDV
-                                                if (isset($g['phan_loai_nhan_su']) && $g['phan_loai_nhan_su'] !== 'HDV') continue;
+                                        <select name="hdv_id" id="hdv_select" class="form-select" required disabled>
+                                            <option value="">-- Vui lòng chọn ngày trước --</option>
+                                            <?php foreach ($listHDV as $g): 
+                                                if ($g['trang_thai'] !== 'SanSang' && $g['trang_thai'] !== 'DangBan') continue;
                                             ?>
-                                                <option value="<?= $g['id'] ?>">
+                                                <option value="<?= $g['id'] ?>" data-name="<?= $g['ho_ten'] ?> (<?= $g['sdt'] ?>)">
                                                     <?= $g['ho_ten'] ?> (<?= $g['sdt'] ?>)
                                                 </option>
                                             <?php endforeach; ?>
@@ -103,16 +104,12 @@
 
                                     <div class="mb-3">
                                         <label class="fw-bold text-secondary">Tài Xế</label>
-                                        <select name="taixe_id" class="form-select" required>
-                                            <option value="">-- Chọn Tài Xế --</option>
-                                            <?php
-                                            // Sử dụng biến $listTaiXe được truyền từ Controller (hoặc lọc từ $guides/allStaff)
-                                            $sourceTaiXe = isset($listTaiXe) ? $listTaiXe : ($guides ?? []);
-                                            foreach ($sourceTaiXe as $g):
-                                                // Chỉ hiện Tài xế (nếu dùng chung nguồn dữ liệu)
-                                                if (isset($g['phan_loai_nhan_su']) && $g['phan_loai_nhan_su'] !== 'TaiXe') continue;
+                                        <select name="taixe_id" id="taixe_select" class="form-select" required disabled>
+                                            <option value="">-- Vui lòng chọn ngày trước --</option>
+                                            <?php foreach ($listTaiXe as $g): 
+                                                if ($g['trang_thai'] !== 'SanSang' && $g['trang_thai'] !== 'DangBan') continue;
                                             ?>
-                                                <option value="<?= $g['id'] ?>">
+                                                <option value="<?= $g['id'] ?>" data-name="<?= $g['ho_ten'] ?> (<?= $g['sdt'] ?>)">
                                                     <?= $g['ho_ten'] ?> (<?= $g['sdt'] ?>)
                                                 </option>
                                             <?php endforeach; ?>
@@ -143,6 +140,8 @@
     <script src="https://npmcdn.com/flatpickr/dist/l10n/vn.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            const schedules = <?= json_encode($futureSchedules ?? []) ?>;
+
             const baseConfig = {
                 enableTime: true,
                 dateFormat: "Y-m-d H:i",
@@ -164,6 +163,90 @@
             const fp_start = flatpickr("#ngay_khoi_hanh", startConfig);
             const fp_end = flatpickr("#ngay_ket_thuc", endConfig);
             const tourSelect = document.getElementById('tour_select');
+            const hdvSelect = document.getElementById('hdv_select');
+            const taixeSelect = document.getElementById('taixe_select');
+
+            // 2. THÊM ĐOẠN VALIDATION NÀY
+            const form = document.getElementById('formLich');
+            form.addEventListener('submit', function(e) {
+                const startDate = document.getElementById('ngay_khoi_hanh').value;
+                if (!startDate) {
+                    e.preventDefault(); // Ngừng gửi form
+                    alert('Vui lòng chọn Ngày Giờ Khởi Hành!');
+                    fp_start.open(); // Tự động mở lịch lên cho người dùng chọn
+                }
+            });
+
+            // Logic cũ giữ nguyên
+            function checkBusy(staffId, start, end) {
+                const checkStart = new Date(start);
+                const checkEnd = new Date(end);
+
+                for (let s of schedules) {
+                    if (s.nhan_vien_id == staffId) {
+                        const busStart = new Date(s.ngay_khoi_hanh);
+                        const busyEnd = new Date(s.ngay_ket_thuc);
+                        if (checkStart < busyEnd && checkEnd > busStart) {
+                            return s.ten_tour;
+                        }
+                    }
+                }
+                return null;
+            }
+
+            function updateStaffAvailability() {
+                const startDateStr = document.getElementById('ngay_khoi_hanh').value;
+                const endDateStr = document.getElementById('ngay_ket_thuc').value;
+
+                if (!startDateStr || !endDateStr) {
+                    hdvSelect.disabled = true;
+                    taixeSelect.disabled = true;
+                    hdvSelect.firstElementChild.textContent = "-- Vui lòng chọn ngày trước --";
+                    taixeSelect.firstElementChild.textContent = "-- Vui lòng chọn ngày trước --";
+                    return;
+                }
+
+                hdvSelect.disabled = false;
+                taixeSelect.disabled = false;
+                hdvSelect.firstElementChild.textContent = "-- Chọn Hướng Dẫn Viên --";
+                taixeSelect.firstElementChild.textContent = "-- Chọn Tài Xế --";
+
+                // Xử lý HDV
+                Array.from(hdvSelect.options).forEach(opt => {
+                    if (!opt.value) return; 
+                    const busyTour = checkBusy(opt.value, startDateStr, endDateStr);
+                    const originalName = opt.getAttribute('data-name');
+                    if (busyTour) {
+                        opt.textContent = "⛔ " + originalName + " (Bận: " + busyTour + ")";
+                        opt.disabled = true;
+                        opt.style.color = '#dc3545';
+                        opt.style.fontWeight = 'bold';
+                    } else {
+                        opt.textContent = originalName;
+                        opt.disabled = false;
+                        opt.style.color = '';
+                        opt.style.fontWeight = '';
+                    }
+                });
+
+                // Xử lý Tài Xế
+                Array.from(taixeSelect.options).forEach(opt => {
+                    if (!opt.value) return;
+                    const busyTour = checkBusy(opt.value, startDateStr, endDateStr);
+                    const originalName = opt.getAttribute('data-name');
+                    if (busyTour) {
+                        opt.textContent = "⛔ " + originalName + " (Bận: " + busyTour + ")";
+                        opt.disabled = true;
+                        opt.style.color = '#dc3545';
+                        opt.style.fontWeight = 'bold';
+                    } else {
+                        opt.textContent = originalName;
+                        opt.disabled = false;
+                        opt.style.color = '';
+                        opt.style.fontWeight = '';
+                    }
+                });
+            }
 
             function calculateEndDate() {
                 const startDateStr = document.getElementById('ngay_khoi_hanh').value;
@@ -178,7 +261,9 @@
                     endDate.setHours(17, 0, 0, 0);
                     fp_end.setDate(endDate);
                 }
+                updateStaffAvailability();
             }
+
             document.getElementById('ngay_khoi_hanh').addEventListener('change', calculateEndDate);
             tourSelect.addEventListener('change', calculateEndDate);
         });

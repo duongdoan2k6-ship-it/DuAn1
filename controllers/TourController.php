@@ -260,22 +260,17 @@ class TourController extends BaseController
     {
         $tours = $this->tourModel->getAll();
 
-        $listHDV = $this->guideModel->getAll([
-            'role' => 'HDV',
-            'trang_thai' => 'SanSang'
-        ]);
+        $listHDV = $this->guideModel->getAll(['role' => 'HDV']);
 
-        $listTaiXe = $this->guideModel->getAll([
-            'role' => 'TaiXe',
-            'trang_thai' => 'SanSang'
-        ]);
-        $guides = $this->lichModel->getAllHDVList();
+        $listTaiXe = $this->guideModel->getAll(['role' => 'TaiXe']);
+
+        $futureSchedules = $this->lichModel->getAllFutureSchedules();
 
         $this->render('pages/admin/form_them_lich', [
             'tours' => $tours,
-            'guides' => $guides,
             'listHDV' => $listHDV,
-            'listTaiXe' => $listTaiXe
+            'listTaiXe' => $listTaiXe,
+            'futureSchedules' => $futureSchedules
         ]);
     }
 
@@ -315,6 +310,9 @@ class TourController extends BaseController
                 if ($lichId) {
                     if (!empty($data['hdv_id'])) {
                         $this->lichModel->assignStaff($lichId, $data['hdv_id'], 'HDV_chinh');
+                    }
+                    if (!empty($_POST['taixe_id'])) {
+                        $this->lichModel->assignStaff($lichId, $_POST['taixe_id'], 'TaiXe');
                     }
                 }
 

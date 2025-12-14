@@ -125,7 +125,7 @@
                                         <td>
                                             <strong><?= $tour['ten_tour'] ?></strong><br>
                                             <span class="badge bg-info text-dark">
-                                                <i class="far fa-clock"></i> <?= $tour['so_ngay'] ?>N <?= $tour['so_dem'] ?>Đ
+                                                <i class="far fa-clock"></i> <?= $tour['so_ngay'] ?> Ngày
                                             </span>
                                         </td>
 
