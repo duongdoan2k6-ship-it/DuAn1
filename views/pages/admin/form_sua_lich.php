@@ -13,6 +13,10 @@
             color: #333;
             font-weight: bold;
         }
+        .readonly-field {
+            background-color: #e9ecef;
+            cursor: not-allowed;
+        }
     </style>
 </head>
 <body class="bg-light">
@@ -55,44 +59,63 @@
                             
                             <div class="row">
                                 <div class="col-md-6 mb-3">
-                                    <label class="form-label fw-bold">Tour Du Lịch</label>
-                                    <select name="tour_id" class="form-select" required>
-                                        <?php foreach ($tours as $t): ?>
-                                            <option value="<?= $t['id'] ?>" <?= $t['id'] == $lich['tour_id'] ? 'selected' : '' ?>>
-                                                <?= $t['ten_tour'] ?>
-                                            </option>
-                                        <?php endforeach; ?>
+                                    <label class="form-label fw-bold">Tour Du Lịch <small class="text-muted">(Không được đổi)</small></label>
+                                    <select class="form-select readonly-field" disabled>
+                                        <option selected><?= $lich['ten_tour'] ?></option>
                                     </select>
+                                    <input type="hidden" name="tour_id" value="<?= $lich['tour_id'] ?>">
                                 </div>
+                                
                                 <div class="col-md-3 mb-3">
                                     <label class="form-label fw-bold">Ngày Khởi Hành</label>
-                                    <input type="datetime-local" name="ngay_khoi_hanh" class="form-control" 
-                                           value="<?= date('Y-m-d\TH:i', strtotime($lich['ngay_khoi_hanh'])) ?>" required>
+                                    <input type="date" class="form-control readonly-field" 
+                                           value="<?= date('Y-m-d', strtotime($lich['ngay_khoi_hanh'])) ?>" readonly>
                                 </div>
                                 <div class="col-md-3 mb-3">
-                                    <label class="form-label fw-bold">Ngày Kết Thúc</label>
-                                    <input type="datetime-local" name="ngay_ket_thuc" class="form-control" 
-                                           value="<?= date('Y-m-d\TH:i', strtotime($lich['ngay_ket_thuc'])) ?>" required>
+                                    <label class="form-label fw-bold text-primary">Giờ Khởi Hành</label>
+                                    <input type="time" name="gio_khoi_hanh" class="form-control border-primary" 
+                                           value="<?= date('H:i', strtotime($lich['ngay_khoi_hanh'])) ?>" required>
                                 </div>
                             </div>
 
                             <div class="row">
                                 <div class="col-md-6 mb-3">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-bold">Ngày Kết Thúc</label>
+                                            <input type="date" class="form-control readonly-field" 
+                                                   value="<?= date('Y-m-d', strtotime($lich['ngay_ket_thuc'])) ?>" readonly>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-bold text-primary">Giờ Kết Thúc</label>
+                                            <input type="time" name="gio_ket_thuc" class="form-control border-primary" 
+                                                   value="<?= date('H:i', strtotime($lich['ngay_ket_thuc'])) ?>" required>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
                                     <label class="form-label fw-bold">Điểm Tập Trung</label>
                                     <input type="text" name="diem_tap_trung" class="form-control" 
                                            value="<?= htmlspecialchars($lich['diem_tap_trung']) ?>" required>
                                 </div>
-                                <div class="col-md-3 mb-3">
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
                                     <label class="form-label fw-bold">Số Chỗ Tối Đa</label>
                                     <input type="number" name="so_cho_toi_da" class="form-control" 
-                                           value="<?= $lich['so_cho_toi_da'] ?>" min="1" required>
-                                    <small class="text-danger fst-italic">Đã đặt: <?= $lich['so_cho_da_dat'] ?> chỗ</small>
+                                           value="<?= $lich['so_cho_toi_da'] ?>" 
+                                           min="<?= $lich['so_cho_da_dat'] ?>" required>
+                                    <small class="text-danger fst-italic">
+                                        Đã đặt: <?= $lich['so_cho_da_dat'] ?> chỗ (Không thể giảm thấp hơn số này)
+                                    </small>
                                 </div>
-                                <div class="col-md-3 mb-3">
+                                <div class="col-md-6 mb-3">
                                     <label class="form-label fw-bold">Trạng Thái</label>
                                     <select name="trang_thai" class="form-select">
                                         <?php 
-                                            $states = ['NhanKhach' => 'Nhận Khách', 'DaDay' => 'Đã Đầy', 'DangDi' => 'Đang Đi', 'HoanThanh' => 'Hoàn Thành', 'Huy' => 'Hủy'];
+                                            $states = ['NhanKhach' => 'Nhận Khách', 'KhongNhanThemKhach' => 'Không nhận thêm khách'];
                                             foreach ($states as $key => $label): 
                                         ?>
                                             <option value="<?= $key ?>" <?= $key == $lich['trang_thai'] ? 'selected' : '' ?>>
@@ -105,7 +128,7 @@
 
                             <div class="text-end border-bottom pb-4 mb-4">
                                 <button type="submit" class="btn btn-warning fw-bold px-4">
-                                    <i class="bi bi-save"></i> Lưu Thông Tin
+                                    <i class="bi bi-save"></i> Lưu Thay Đổi
                                 </button>
                             </div>
                         </form>

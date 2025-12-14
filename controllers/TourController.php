@@ -355,21 +355,54 @@ class TourController extends BaseController {
     public function updateSchedule() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $id = $_POST['id'];
+            
+            // 1. Lấy thông tin hiện tại trong DB để check ràng buộc
+            $currentLich = $this->lichModel->getDetail($id);
+            if (!$currentLich) {
+                die("Lỗi: Không tìm thấy lịch trình!");
+            }
+
+            // 2. Validate số chỗ: Không được giảm thấp hơn số đã đặt
+            $soChoMoi = $_POST['so_cho_toi_da'];
+            $soChoDaDat = $currentLich['so_cho_da_dat'];
+
+            if ($soChoMoi < $soChoDaDat) {
+                $errorMsg = "Không thể giảm số chỗ xuống $soChoMoi vì đã có $soChoDaDat khách đặt!";
+                header("Location: index.php?action=admin-schedule-staff&id=$id&error=" . urlencode($errorMsg));
+                return;
+            }
+
+            // 3. Xử lý thời gian: Giữ nguyên NGÀY cũ, chỉ cập nhật GIỜ mới
+            // Lấy phần ngày (Y-m-d) từ dữ liệu cũ
+            $oldStartDate = date('Y-m-d', strtotime($currentLich['ngay_khoi_hanh']));
+            $oldEndDate = date('Y-m-d', strtotime($currentLich['ngay_ket_thuc']));
+
+            // Lấy phần giờ (H:i) từ form gửi lên
+            $newStartTime = $_POST['gio_khoi_hanh']; // format 08:00
+            $newEndTime = $_POST['gio_ket_thuc'];   // format 18:00
+
+            // Ghép lại thành datetime hoàn chỉnh
+            $finalStart = $oldStartDate . ' ' . $newStartTime . ':00';
+            $finalEnd = $oldEndDate . ' ' . $newEndTime . ':00';
+
+            // 4. Chuẩn bị dữ liệu update (Lưu ý: KHÔNG update tour_id)
             $data = [
-                'tour_id' => $_POST['tour_id'],
-                'ngay_khoi_hanh' => $_POST['ngay_khoi_hanh'],
-                'ngay_ket_thuc' => $_POST['ngay_ket_thuc'],
-                'so_cho_toi_da' => $_POST['so_cho_toi_da'],
+                'ngay_khoi_hanh' => $finalStart,
+                'ngay_ket_thuc' => $finalEnd,
+                'so_cho_toi_da' => $soChoMoi,
                 'diem_tap_trung' => $_POST['diem_tap_trung'],
                 'trang_thai' => $_POST['trang_thai']
             ];
 
-            if ($this->lichModel->update($id, $data)) {
+            // 5. Gọi Model update
+            // Sử dụng hàm mới updateScheduleInfo thay vì update thường
+            if ($this->lichModel->updateScheduleInfo($id, $data)) {
                 $msg = 'updated';
+                header("Location: index.php?action=admin-schedule-staff&id=$id&msg=$msg");
             } else {
-                $msg = 'error';
+                $msg = 'Lỗi hệ thống, vui lòng thử lại';
+                header("Location: index.php?action=admin-schedule-staff&id=$id&error=" . urlencode($msg));
             }
-            header("Location: index.php?action=admin-schedule-staff&id=$id&msg=$msg");
         }
     }
 

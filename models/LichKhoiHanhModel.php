@@ -277,5 +277,20 @@ class LichKhoiHanhModel extends BaseModel
             'id' => $id
         ]);
     }
+    
+    public function updateScheduleInfo($id, $data) {
+        // Lưu ý: SQL này KHÔNG có tour_id
+        $sql = "UPDATE lich_khoi_hanh 
+                SET ngay_khoi_hanh = :ngay_khoi_hanh, 
+                    ngay_ket_thuc = :ngay_ket_thuc, 
+                    so_cho_toi_da = :so_cho_toi_da,
+                    diem_tap_trung = :diem_tap_trung,
+                    trang_thai = :trang_thai 
+                WHERE id = :id";
+        
+        $stmt = $this->conn->prepare($sql);
+        $data['id'] = $id;
+        return $stmt->execute($data);
+    }
 }
 ?>
