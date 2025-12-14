@@ -64,8 +64,7 @@ class SupplierController extends BaseController {
             header('Location: index.php?action=admin-suppliers&msg=updated');
         }
     }
-
-    // [NÂNG CẤP] Xóa an toàn
+    
     public function delete() {
         if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') exit;
 

@@ -9,8 +9,6 @@ if (!function_exists('debug')) {
         die(); 
     }
 }
-
-// [MỚI] Hàm định dạng tiền tệ (Dùng chung cho toàn web)
 if (!function_exists('currency_format')) {
     function currency_format($number, $suffix = ' VNĐ') {
         if ($number === null) return '0' . $suffix;

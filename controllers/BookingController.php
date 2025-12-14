@@ -1,7 +1,6 @@
 <?php
 class BookingController extends BaseController {
 
-    // Danh sách booking (Giữ nguyên logic cũ)
     public function index() {
         if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
             header('Location: ' . BASE_URL . 'routes/index.php?action=login');
@@ -27,7 +26,6 @@ class BookingController extends BaseController {
         ]);
     }
 
-    // Cập nhật trạng thái (Giữ nguyên logic cũ)
     public function updateStatus() {
         if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
             header('Location: ' . BASE_URL . 'routes/index.php?action=login');
@@ -59,7 +57,6 @@ class BookingController extends BaseController {
         header('Location: ' . BASE_URL . 'routes/index.php?action=admin-bookings');
     }
 
-    // Hiển thị form tạo booking
     public function create() {
         if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') exit;
 
@@ -69,8 +66,6 @@ class BookingController extends BaseController {
         $this->render('pages/admin/bookings/create', ['schedules' => $schedules]);
     }
 
-    // [NÂNG CẤP] Xử lý lưu booking kèm danh sách thành viên
-    // [NÂNG CẤP] Xử lý lưu booking kèm danh sách thành viên
     public function store() {
         if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') exit;
 

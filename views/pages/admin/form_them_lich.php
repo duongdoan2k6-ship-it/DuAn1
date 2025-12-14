@@ -85,7 +85,7 @@
 
                                     <div class="mb-3">
                                         <label class="fw-bold text-success">Hướng Dẫn Viên (Chính)</label>
-                                        <select name="hdv_id" class="form-select">
+                                        <select name="hdv_id" class="form-select" required>
                                             <option value="">-- Chọn Hướng Dẫn Viên --</option>
                                             <?php
                                             // Sử dụng biến $listHDV được truyền từ Controller (hoặc lọc từ $guides nếu chưa sửa controller)
@@ -103,7 +103,7 @@
 
                                     <div class="mb-3">
                                         <label class="fw-bold text-secondary">Tài Xế</label>
-                                        <select name="taixe_id" class="form-select">
+                                        <select name="taixe_id" class="form-select" required>
                                             <option value="">-- Chọn Tài Xế --</option>
                                             <?php
                                             // Sử dụng biến $listTaiXe được truyền từ Controller (hoặc lọc từ $guides/allStaff)

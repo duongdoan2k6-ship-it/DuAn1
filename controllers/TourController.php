@@ -4,12 +4,14 @@ class TourController extends BaseController
     private $tourModel;
     private $supplierModel;
     private $lichModel;
+    private $guideModel;
 
     public function __construct()
     {
         $this->tourModel = new TourModel();
         $this->supplierModel = new SupplierModel();
         $this->lichModel = new LichKhoiHanhModel();
+        $this->guideModel = new GuideModel();
     }
 
     public function index()
@@ -257,12 +259,23 @@ class TourController extends BaseController
     public function createLich()
     {
         $tours = $this->tourModel->getAll();
-        // Lấy danh sách HDV đang sẵn sàng để chọn nhanh
+
+        $listHDV = $this->guideModel->getAll([
+            'role' => 'HDV',
+            'trang_thai' => 'SanSang'
+        ]);
+
+        $listTaiXe = $this->guideModel->getAll([
+            'role' => 'TaiXe',
+            'trang_thai' => 'SanSang'
+        ]);
         $guides = $this->lichModel->getAllHDVList();
 
         $this->render('pages/admin/form_them_lich', [
             'tours' => $tours,
-            'guides' => $guides
+            'guides' => $guides,
+            'listHDV' => $listHDV,
+            'listTaiXe' => $listTaiXe
         ]);
     }
 
@@ -280,8 +293,8 @@ class TourController extends BaseController
             ];
             if (!empty($data['hdv_id'])) {
                 $busyTour = $this->lichModel->checkStaffAvailability(
-                    $data['hdv_id'], 
-                    $data['ngay_khoi_hanh'], 
+                    $data['hdv_id'],
+                    $data['ngay_khoi_hanh'],
                     $data['ngay_ket_thuc']
                 );
 
@@ -289,10 +302,10 @@ class TourController extends BaseController
                     $tenTour = $busyTour['ten_tour'];
                     $start = date('d/m H:i', strtotime($busyTour['ngay_khoi_hanh']));
                     $end = date('d/m H:i', strtotime($busyTour['ngay_ket_thuc']));
-                    
+
                     $errorMsg = "Nhân sự được chọn có lịch đi: \"$tenTour\" trong thời gian thời gian: ($start - $end).";
                     header('Location: index.php?action=admin-create-lich&error=' . urlencode($errorMsg));
-                    return; 
+                    return;
                 }
             }
 
@@ -324,15 +337,20 @@ class TourController extends BaseController
         }
         $tours = $this->tourModel->getAll();
         $assignedStaff = $this->lichModel->getAssignedStaff($id);
-        $allStaff = $this->lichModel->getAvailableStaff(
-            $lich['ngay_khoi_hanh'], 
-            $lich['ngay_ket_thuc']
-        );
+
+        $startDate = $lich['ngay_khoi_hanh'];
+        $endDate = $lich['ngay_ket_thuc'];
+
+        $listHDV = $this->lichModel->getAvailableStaff($startDate, $endDate, 'HDV');
+
+        $listTaiXe = $this->lichModel->getAvailableStaff($startDate, $endDate, 'TaiXe');
+
         $this->render('pages/admin/form_sua_lich', [
             'lich' => $lich,
             'tours' => $tours,
             'assignedStaff' => $assignedStaff,
-            'allStaff' => $allStaff  
+            'listHDV' => $listHDV,     
+            'listTaiXe' => $listTaiXe  
         ]);
     }
 

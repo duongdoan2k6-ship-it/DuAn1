@@ -185,15 +185,16 @@ class GuideManagerController extends BaseController
         $this->render('pages/admin/guides/detail', ['guide' => $guide, 'history' => $history]);
     }
 
-    private function uploadImage($file) {
-    $targetDir = "../assets/uploads/hdv/"; 
-    if (!file_exists($targetDir)) {
-        mkdir($targetDir, 0777, true); 
+    private function uploadImage($file)
+    {
+        $targetDir = "../assets/uploads/hdv/";
+        if (!file_exists($targetDir)) {
+            mkdir($targetDir, 0777, true);
+        }
+        $fileName = time() . "_" . basename($file["name"]);
+        if (move_uploaded_file($file["tmp_name"], $targetDir . $fileName)) {
+            return $fileName;
+        }
+        return false;
     }
-    $fileName = time() . "_" . basename($file["name"]);
-    if (move_uploaded_file($file["tmp_name"], $targetDir . $fileName)) {
-        return $fileName;
-    }
-    return false;
-}
 }

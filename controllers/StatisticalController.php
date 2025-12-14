@@ -1,13 +1,16 @@
 <?php
-class StatisticalController extends BaseController {
+class StatisticalController extends BaseController
+{
     private $statisticalModel;
 
-    public function __construct() {
+    public function __construct()
+    {
         // Khởi tạo Model
         $this->statisticalModel = new StatisticalModel();
     }
 
-    public function index() {
+    public function index()
+    {
         // 1. Xử lý thời gian lọc:
         // Nếu không có tham số trên URL, mặc định lấy ngày đầu tháng đến cuối tháng hiện tại
         $fromDate = $_GET['from_date'] ?? date('Y-m-01');
@@ -29,4 +32,3 @@ class StatisticalController extends BaseController {
         ]);
     }
 }
-?>
