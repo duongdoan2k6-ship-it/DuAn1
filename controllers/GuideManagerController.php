@@ -39,18 +39,20 @@ class GuideManagerController extends BaseController {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $email = trim($_POST['email']);
             
+            // 1. Kiểm tra email
             if ($this->guideModel->checkEmailExists($email)) {
                 echo "<script>alert('Lỗi: Email này đã tồn tại!'); window.history.back();</script>";
                 return;
             }
 
+            // 2. Xử lý ảnh
             $anh = 'default_avatar.png';
             if (isset($_FILES['anh_dai_dien']) && $_FILES['anh_dai_dien']['error'] == 0) {
                 $uploaded = $this->uploadImage($_FILES['anh_dai_dien']);
                 if ($uploaded) $anh = $uploaded;
             }
 
-            // SỬA: Lưu mật khẩu thô, không dùng password_hash
+            // 3. Mật khẩu
             $mat_khau_hash = $_POST['mat_khau'];
 
             $data = [
@@ -60,13 +62,10 @@ class GuideManagerController extends BaseController {
                 'mat_khau' => $mat_khau_hash,
                 'sdt' => $_POST['sdt'],
                 'anh' => $anh,
-                'ngon_ngu' => $_POST['ngon_ngu'],
-                'chung_chi' => $_POST['chung_chi'],
-                'kinh_nghiem' => $_POST['kinh_nghiem'],
+                'chung_chi' => $_POST['chung_chi'] ?? '',
+                'kinh_nghiem' => $_POST['kinh_nghiem'] ?? '',
                 'suc_khoe' => $_POST['suc_khoe'] ?? 'Tốt',
-                'phan_loai' => $_POST['phan_loai'],
-                'role' => $_POST['phan_loai_nhan_su'],
-                'trang_thai' => 'SanSang'
+                'role' => $_POST['phan_loai_nhan_su'] ?? 'HDV', 
             ];
 
             if ($this->guideModel->insert($data)) {
@@ -90,11 +89,13 @@ class GuideManagerController extends BaseController {
             $id = $_POST['id'];
             $email = trim($_POST['email']);
 
+            // Kiểm tra email trùng
             if ($this->guideModel->checkEmailExists($email, $id)) {
                 echo "<script>alert('Lỗi: Email này đã được sử dụng!'); window.history.back();</script>";
                 return;
             }
 
+            // Xử lý ảnh đại diện
             $oldInfo = $this->guideModel->getDetail($id);
             $anh = $oldInfo['anh_dai_dien'];
 
@@ -102,7 +103,7 @@ class GuideManagerController extends BaseController {
                 $newImg = $this->uploadImage($_FILES['anh_dai_dien']);
                 if ($newImg) {
                     $anh = $newImg;
-                    // Xóa ảnh cũ
+                    // Xóa ảnh cũ nếu không phải mặc định
                     if ($oldInfo['anh_dai_dien'] != 'default_avatar.png') {
                         $oldPath = 'assets/uploads/hdv/' . $oldInfo['anh_dai_dien'];
                         if (file_exists($oldPath)) unlink($oldPath);
@@ -110,31 +111,27 @@ class GuideManagerController extends BaseController {
                 }
             }
 
-            // Chỉ đổi mật khẩu nếu nhập mới
+            // Xử lý mật khẩu (chỉ cập nhật nếu người dùng nhập mới)
             $mat_khau_update = '';
             if (!empty($_POST['mat_khau_moi'])) {
-                // SỬA: Lưu mật khẩu thô nếu có thay đổi
                 $mat_khau_update = $_POST['mat_khau_moi'];
             }
 
-            // [ĐÃ SỬA] Thêm ?? '' vào các trường không bắt buộc để tránh lỗi Undefined array key
+            // [ĐÃ SỬA] Chỉ lấy các trường thông tin cá nhân từ Form
+            // Đã bỏ: chung_chi, kinh_nghiem, suc_khoe, phan_loai, role
             $data = [
-                'ho_ten' => $_POST['ho_ten'],
+                'ho_ten'    => $_POST['ho_ten'],
                 'ngay_sinh' => $_POST['ngay_sinh'],
-                'email' => $email,
-                'sdt' => $_POST['sdt'],
-                'anh' => $anh,
-                'ngon_ngu' => $_POST['ngon_ngu'] ?? '', 
-                'chung_chi' => $_POST['chung_chi'] ?? '',
-                'kinh_nghiem' => $_POST['kinh_nghiem'] ?? '',
-                'suc_khoe' => $_POST['suc_khoe'] ?? '',
-                'phan_loai' => $_POST['phan_loai'],
-                'role' => $_POST['phan_loai_nhan_su'],
-                'trang_thai' => $_POST['trang_thai'],
-                'mat_khau' => $mat_khau_update
+                'email'     => $email,
+                'sdt'       => $_POST['sdt'],
+                'anh'       => $anh,
+                'mat_khau'  => $mat_khau_update
             ];
 
+            // Gọi Model để update
             $this->guideModel->update($id, $data);
+            
+            // Chuyển hướng
             header('Location: ' . BASE_URL . 'routes/index.php?action=admin-guides&msg=updated');
         }
     }

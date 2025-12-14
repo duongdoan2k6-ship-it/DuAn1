@@ -302,5 +302,19 @@ class LichKhoiHanhModel extends BaseModel
         ]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+    public function getUpcomingSchedulesByStaff($staffId) {
+        $sql = "SELECT t.ten_tour, lkh.ngay_khoi_hanh, lkh.id
+                FROM lich_nhan_vien lnv
+                JOIN lich_khoi_hanh lkh ON lnv.lich_khoi_hanh_id = lkh.id
+                JOIN tours t ON lkh.tour_id = t.id
+                WHERE lnv.nhan_vien_id = :id
+                AND lkh.trang_thai != 'Huy'
+                AND lkh.ngay_khoi_hanh >= CURDATE() 
+                ORDER BY lkh.ngay_khoi_hanh ASC";
+        
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute(['id' => $staffId]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }
 ?>

@@ -8,6 +8,8 @@
 </head>
 <body class="bg-light">
     
+    <?php $isLocked = isset($phienInfo['trang_thai_khoa']) && $phienInfo['trang_thai_khoa'] == 1; ?>
+
     <nav class="navbar navbar-dark bg-primary mb-4">
         <div class="container">
             <a class="navbar-brand" href="<?= BASE_URL ?>routes/index.php?action=hdv-tour-detail&id=<?= $lichId ?>">
@@ -20,30 +22,39 @@
     </nav>
 
     <div class="container">
+        <?php if(isset($_GET['status']) && $_GET['status'] == 'locked_error'): ?>
+            <div class="alert alert-danger alert-dismissible fade show">
+                <i class="bi bi-exclamation-triangle"></i> Phiên này đã khóa, không thể chỉnh sửa!
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        <?php endif; ?>
+
         <?php if(isset($_GET['status']) && $_GET['status'] == 'dd_saved'): ?>
             <div class="alert alert-success alert-dismissible fade show">
-                <i class="bi bi-check-circle"></i> Đã lưu điểm danh thành công!
+                <i class="bi bi-check-circle"></i> Đã lưu và khóa điểm danh thành công!
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
         <?php endif; ?>
         
-        <?php if(isset($_GET['status']) && $_GET['status'] == 'phien_created'): ?>
-            <div class="alert alert-success">
-                <i class="bi bi-plus-circle"></i> Phiên điểm danh mới đã được tạo. Hãy kiểm tra danh sách bên dưới.
-            </div>
-        <?php endif; ?>
-
         <div class="card shadow">
             <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
                 <div>
                     <h4 class="mb-0 text-primary">
                         <i class="bi bi-clipboard-check"></i> <?= htmlspecialchars($phienInfo['tieu_de']) ?>
+                        <?php if($isLocked): ?>
+                            <span class="badge bg-danger ms-2"><i class="bi bi-lock-fill"></i> Đã khóa</span>
+                        <?php else: ?>
+                            <span class="badge bg-success ms-2"><i class="bi bi-unlock-fill"></i> Đang mở</span>
+                        <?php endif; ?>
                     </h4>
                     <small class="text-muted">Ngày tạo: <?= date('H:i d/m/Y', strtotime($phienInfo['thoi_gian_tao'])) ?></small>
                 </div>
+                
+                <?php if(!$isLocked): ?>
                 <button type="button" class="btn btn-outline-primary btn-sm" onclick="checkAllPresent()">
                     <i class="bi bi-check-all"></i> Tất cả Có mặt
                 </button>
+                <?php endif; ?>
             </div>
             <div class="card-body">
                 <form action="<?= BASE_URL ?>routes/index.php?action=hdv-save-diem-danh" method="POST">
@@ -78,13 +89,15 @@
                                             <input type="radio" class="btn-check" 
                                                    name="attendance[<?= $p['khach_id'] ?>][status]" 
                                                    id="btn-absent-<?= $p['khach_id'] ?>" 
-                                                   value="0" <?= $p['trang_thai'] == 0 ? 'checked' : '' ?>>
+                                                   value="0" <?= $p['trang_thai'] == 0 ? 'checked' : '' ?>
+                                                   <?= $isLocked ? 'disabled' : '' ?>>
                                             <label class="btn btn-outline-danger" for="btn-absent-<?= $p['khach_id'] ?>">Vắng</label>
 
                                             <input type="radio" class="btn-check class-present" 
                                                    name="attendance[<?= $p['khach_id'] ?>][status]" 
                                                    id="btn-present-<?= $p['khach_id'] ?>" 
-                                                   value="1" <?= $p['trang_thai'] == 1 ? 'checked' : '' ?>>
+                                                   value="1" <?= $p['trang_thai'] == 1 ? 'checked' : '' ?>
+                                                   <?= $isLocked ? 'disabled' : '' ?>>
                                             <label class="btn btn-outline-success" for="btn-present-<?= $p['khach_id'] ?>">Có mặt</label>
                                         </div>
                                     </td>
@@ -93,7 +106,8 @@
                                         <input type="text" class="form-control" 
                                                name="attendance[<?= $p['khach_id'] ?>][note]" 
                                                value="<?= htmlspecialchars($p['ghi_chu'] ?? '') ?>" 
-                                               placeholder="Lý do vắng...">
+                                               placeholder="Lý do vắng..."
+                                               <?= $isLocked ? 'disabled' : '' ?>>
                                     </td>
                                 </tr>
                                 <?php endforeach; ?>
@@ -103,9 +117,16 @@
 
                     <div class="d-flex justify-content-end mt-3">
                         <a href="<?= BASE_URL ?>routes/index.php?action=hdv-tour-detail&id=<?= $lichId ?>" class="btn btn-secondary me-2">Quay lại</a>
-                        <button type="submit" class="btn btn-primary px-4 fw-bold">
-                            <i class="bi bi-save"></i> LƯU TRẠNG THÁI
-                        </button>
+                        
+                        <?php if(!$isLocked): ?>
+                            <button type="submit" class="btn btn-primary px-4 fw-bold" onclick="return confirm('LƯU Ý: Sau khi lưu, bạn sẽ KHÔNG thể chỉnh sửa lại. Bạn có chắc chắn không?')">
+                                <i class="bi bi-save"></i> LƯU & KHÓA
+                            </button>
+                        <?php else: ?>
+                            <button type="button" class="btn btn-secondary px-4 fw-bold" disabled>
+                                <i class="bi bi-lock-fill"></i> ĐÃ KHÓA
+                            </button>
+                        <?php endif; ?>
                     </div>
                 </form>
             </div>
@@ -118,7 +139,10 @@
         function checkAllPresent() {
             let presents = document.querySelectorAll('.class-present');
             presents.forEach(radio => {
-                radio.checked = true;
+                // Kiểm tra xem radio có bị disabled không trước khi check
+                if (!radio.disabled) {
+                    radio.checked = true;
+                }
             });
         }
     </script>

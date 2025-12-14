@@ -41,27 +41,15 @@
 
                 <h5 class="text-success mb-3 border-bottom pb-2 mt-3">2. Thông tin nghiệp vụ</h5>
                 <div class="row">
-                    <div class="col-md-6 mb-3">
+                    <div class="col-md-12 mb-3">
                         <label class="fw-bold">Vai Trò <span class="text-danger">*</span></label>
                         <select name="phan_loai_nhan_su" class="form-select" required>
                             <option value="HDV">Hướng Dẫn Viên</option>
                             <option value="TaiXe">Tài Xế</option>
-                            <option value="HauCan">Hậu Cần</option>
                         </select>
                     </div>
-                    <div class="col-md-6 mb-3">
-                        <label class="fw-bold">Phân Loại (Chuyên môn)</label>
-                        <select name="phan_loai" class="form-select">
-                            <option value="NoiDia">Nội Địa</option>
-                            <option value="QuocTe">Quốc Tế</option>
-                            <option value="CongTacVien">Cộng Tác Viên</option>
-                        </select>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label>Ngôn ngữ</label>
-                        <input type="text" name="ngon_ngu" class="form-control" placeholder="Anh, Pháp, Trung...">
-                    </div>
-                    <div class="col-md-6 mb-3">
+                    
+                    <div class="col-md-12 mb-3">
                         <label>Sức khỏe</label>
                         <input type="text" name="suc_khoe" class="form-control" value="Tốt">
                     </div>

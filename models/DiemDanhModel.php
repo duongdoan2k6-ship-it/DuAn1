@@ -124,4 +124,11 @@ class DiemDanhModel extends BaseModel
         $stmt->execute(['id' => $id]);
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
+
+    public function lockPhien($phienId)
+    {
+        $sql = "UPDATE phien_diem_danh SET trang_thai_khoa = 1 WHERE id = :id";
+        $stmt = $this->conn->prepare($sql);
+        return $stmt->execute(['id' => $phienId]);
+    }
 }

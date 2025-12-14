@@ -12,7 +12,7 @@
                 <form action="<?= BASE_URL ?>routes/index.php?action=admin-guide-update" method="POST" enctype="multipart/form-data">
                     <input type="hidden" name="id" value="<?= $guide['id'] ?>">
 
-                    <h5 class="text-warning text-dark mb-3 border-bottom pb-2">1. Thông tin cá nhân</h5>
+                    <h5 class="text-warning text-dark mb-3 border-bottom pb-2">Thông tin cá nhân</h5>
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label class="fw-bold">Họ và Tên</label>
@@ -43,39 +43,7 @@
                         </div>
                     </div>
 
-                    <h5 class="text-warning text-dark mb-3 border-bottom pb-2 mt-3">2. Thông tin nghiệp vụ</h5>
-                    <div class="row">
-                        <div class="col-md-4 mb-3">
-                            <label class="fw-bold">Vai Trò</label>
-                            <select name="phan_loai_nhan_su" class="form-select">
-                                <option value="HDV" <?= $guide['phan_loai_nhan_su'] == 'HDV' ? 'selected' : '' ?>>Hướng Dẫn Viên</option>
-                                <option value="TaiXe" <?= $guide['phan_loai_nhan_su'] == 'TaiXe' ? 'selected' : '' ?>>Tài Xế</option>
-                                <option value="HauCan" <?= $guide['phan_loai_nhan_su'] == 'HauCan' ? 'selected' : '' ?>>Hậu Cần</option>
-                            </select>
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <label class="fw-bold">Phân loại</label>
-                            <select name="phan_loai" class="form-select">
-                                <option value="NoiDia" <?= $guide['phan_loai'] == 'NoiDia' ? 'selected' : '' ?>>Nội Địa</option>
-                                <option value="QuocTe" <?= $guide['phan_loai'] == 'QuocTe' ? 'selected' : '' ?>>Quốc Tế</option>
-                                <option value="CongTacVien" <?= $guide['phan_loai'] == 'CongTacVien' ? 'selected' : '' ?>>CTV</option>
-                            </select>
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <label class="fw-bold">Trạng thái</label>
-                            <select name="trang_thai" class="form-select">
-                                <option value="SanSang" <?= $guide['trang_thai'] == 'SanSang' ? 'selected' : '' ?>>Sẵn Sàng</option>
-                                <option value="DangBan" <?= $guide['trang_thai'] == 'DangBan' ? 'selected' : '' ?>>Đang Bận</option>
-                                <option value="NghiPhep" <?= $guide['trang_thai'] == 'NghiPhep' ? 'selected' : '' ?>>Nghỉ/Khóa</option>
-                            </select>
-                        </div>
-                        <div class="col-md-12 mb-3">
-                            <label>Kinh nghiệm</label>
-                            <textarea name="kinh_nghiem" class="form-control" rows="3"><?= htmlspecialchars($guide['kinh_nghiem']) ?></textarea>
-                        </div>
-                    </div>
-
-                    <div class="text-end">
+                    <div class="text-end mt-3">
                         <a href="<?= BASE_URL ?>routes/index.php?action=admin-guides" class="btn btn-secondary">Hủy</a>
                         <button type="submit" class="btn btn-warning fw-bold">Cập Nhật</button>
                     </div>

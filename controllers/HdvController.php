@@ -242,6 +242,12 @@ class HdvController extends BaseController
             $phienId = $_POST['phien_id'];
             $attendanceData = $_POST['attendance'] ?? [];
 
+            $phienInfo = $this->diemDanhModel->getPhienById($phienId);
+            if ($phienInfo && $phienInfo['trang_thai_khoa'] == 1) {
+                header('Location: ' . BASE_URL . 'routes/index.php?action=hdv-view-diem-danh&lich_id=' . $lichId . '&phien_id=' . $phienId . '&status=locked_error');
+                exit;
+            }
+
             $success = true;
             foreach ($attendanceData as $khachId => $data) {
                 $trangThai = $data['status'] ?? 0;
@@ -250,6 +256,9 @@ class HdvController extends BaseController
                 if (!$this->diemDanhModel->saveChiTiet($phienId, $khachId, $trangThai, $ghiChu)) {
                     $success = false;
                 }
+            }
+            if ($success) {
+                $this->diemDanhModel->lockPhien($phienId);
             }
 
             $status = $success ? 'dd_saved' : 'dd_error';

@@ -1,7 +1,6 @@
 <?php
 class GuideModel extends BaseModel
 {
-    // Lấy danh sách nhân sự (Có bộ lọc + Chế độ xem thùng rác)
     public function getAll($filters = [])
     {
         // 1. Xác định điều kiện lọc: Mặc định là lấy người CHƯA xóa
@@ -41,14 +40,11 @@ class GuideModel extends BaseModel
         $stmt->execute($params);
         return $stmt->fetchAll();
     }
-
     public function getDetail($id) {
         $stmt = $this->conn->prepare("SELECT * FROM huong_dan_vien WHERE id = :id");
         $stmt->execute(['id' => $id]);
         return $stmt->fetch();
     }
-
-    // Kiểm tra trùng Email
     public function checkEmailExists($email, $excludeId = null) {
         $sql = "SELECT COUNT(*) FROM huong_dan_vien WHERE email = :email";
         $params = ['email' => $email];
@@ -62,27 +58,22 @@ class GuideModel extends BaseModel
         $stmt->execute($params);
         return $stmt->fetchColumn() > 0;
     }
-
     public function insert($data) {
-        $sql = "INSERT INTO huong_dan_vien (ho_ten, ngay_sinh, email, mat_khau, sdt, anh_dai_dien, ngon_ngu, chung_chi, kinh_nghiem, suc_khoe, phan_loai, phan_loai_nhan_su, trang_thai) 
-                VALUES (:ho_ten, :ngay_sinh, :email, :mat_khau, :sdt, :anh, :ngon_ngu, :chung_chi, :kinh_nghiem, :suc_khoe, :phan_loai, :role, :trang_thai)";
+        $sql = "INSERT INTO huong_dan_vien (ho_ten, ngay_sinh, email, mat_khau, sdt, anh_dai_dien, chung_chi, kinh_nghiem, suc_khoe, phan_loai_nhan_su) 
+        VALUES (:ho_ten, :ngay_sinh, :email, :mat_khau, :sdt, :anh, :chung_chi, :kinh_nghiem, :suc_khoe, :role)";
         $stmt = $this->conn->prepare($sql);
         return $stmt->execute($data);
     }
-
     public function update($id, $data) {
         $sql = "UPDATE huong_dan_vien 
-                SET ho_ten=:ho_ten, ngay_sinh=:ngay_sinh, email=:email, sdt=:sdt, 
-                    anh_dai_dien=:anh, ngon_ngu=:ngon_ngu, chung_chi=:chung_chi, 
-                    kinh_nghiem=:kinh_nghiem, suc_khoe=:suc_khoe, 
-                    phan_loai=:phan_loai, phan_loai_nhan_su=:role, trang_thai=:trang_thai";
-        
-        // Chỉ update mật khẩu nếu có nhập mới
+                SET ho_ten=:ho_ten, 
+                    ngay_sinh=:ngay_sinh, 
+                    email=:email, 
+                    sdt=:sdt, 
+                    anh_dai_dien=:anh";
         if (!empty($data['mat_khau'])) {
             $sql .= ", mat_khau=:mat_khau";
         } else {
-            // [QUAN TRỌNG] Nếu không có mật khẩu mới, PHẢI XÓA key này khỏi mảng data
-            // Nếu không xóa, PDO sẽ báo lỗi vì truyền thừa tham số :mat_khau
             unset($data['mat_khau']);
         }
         
@@ -92,22 +83,18 @@ class GuideModel extends BaseModel
         $stmt = $this->conn->prepare($sql);
         return $stmt->execute($data);
     }
-
     public function delete($id) {
         // Xóa mềm: Cập nhật thời gian xóa
         $sql = "UPDATE huong_dan_vien SET deleted_at = NOW() WHERE id = :id";
         $stmt = $this->conn->prepare($sql);
         return $stmt->execute(['id' => $id]);
     }
-
-    // [MỚI] Hàm khôi phục nhân sự đã xóa
     public function restore($id) {
         // Set deleted_at về NULL để nhân viên xuất hiện trở lại
         $sql = "UPDATE huong_dan_vien SET deleted_at = NULL WHERE id = :id";
         $stmt = $this->conn->prepare($sql);
         return $stmt->execute(['id' => $id]);
     }
-
     public function getHistory($hdv_id) {
         $sql = "SELECT lkh.*, t.ten_tour 
                 FROM lich_khoi_hanh lkh
