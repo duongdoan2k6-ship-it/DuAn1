@@ -5,6 +5,7 @@ class TourModel extends BaseModel {
         $sql = "SELECT t.*, lt.ten_loai 
                 FROM tours t
                 JOIN loai_tour lt ON t.loai_tour_id = lt.id
+                WHERE t.is_active = 1  
                 ORDER BY t.id DESC";
         $stmt = $this->conn->prepare($sql);
         $stmt->execute();
@@ -83,7 +84,34 @@ class TourModel extends BaseModel {
         return $stmt->execute(['id' => $imageId]);
     }
 
+    // 2. [SỬA] Hàm xóa: Đổi thành Update trạng thái (Xóa mềm)
     public function delete($id) {
+        $sql = "UPDATE tours SET is_active = 0 WHERE id = :id";
+        $stmt = $this->conn->prepare($sql);
+        return $stmt->execute(['id' => $id]);
+    }
+
+    // 3. [MỚI] Hàm lấy danh sách thùng rác
+    public function getDeleted() {
+        $sql = "SELECT t.*, lt.ten_loai 
+                FROM tours t
+                JOIN loai_tour lt ON t.loai_tour_id = lt.id
+                WHERE t.is_active = 0 
+                ORDER BY t.id DESC";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
+    // 4. [MỚI] Hàm khôi phục
+    public function restore($id) {
+        $sql = "UPDATE tours SET is_active = 1 WHERE id = :id";
+        $stmt = $this->conn->prepare($sql);
+        return $stmt->execute(['id' => $id]);
+    }
+    
+    // 5. [MỚI] Hàm xóa vĩnh viễn (Logic cũ của delete)
+    public function forceDelete($id) {
         $stmt = $this->conn->prepare("DELETE FROM tours WHERE id = :id");
         return $stmt->execute(['id' => $id]);
     }

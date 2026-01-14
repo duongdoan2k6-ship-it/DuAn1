@@ -19,6 +19,8 @@ class TourController extends BaseController
         $this->render('pages/admin/tours/index', ['tours' => $tours]);
     }
 
+    
+
     public function create()
     {
         $categories = $this->tourModel->getCategories();
@@ -138,6 +140,7 @@ class TourController extends BaseController
         $id = $_POST['id'];
         $tour = $this->tourModel->getDetail($id);
 
+        // 1. Xử lý ảnh đại diện
         $anh_tour = $_POST['anh_cu'];
         if (isset($_FILES['anh_tour']) && $_FILES['anh_tour']['error'] == 0) {
             $anh_tour = $this->uploadImage($_FILES['anh_tour']);
@@ -166,19 +169,33 @@ class TourController extends BaseController
         try {
             $this->tourModel->conn->beginTransaction();
 
+            // Cập nhật thông tin chung tour
             $this->tourModel->update($id, $data);
 
-            $this->tourModel->deleteOldItinerary($id);
-            if (isset($_POST['itinerary_title'])) {
-                foreach ($_POST['itinerary_title'] as $key => $title) {
-                    if (!empty($title)) {
-                        $day = $key + 1;
-                        $content = $_POST['itinerary_content'][$key] ?? '';
-                        $this->tourModel->insertItinerary($id, $day, $title, $content);
-                    }
+            // --- [PHẦN SỬA ĐỔI QUAN TRỌNG] ---
+            // Xử lý Lịch Trình: Dùng vòng lặp FOR theo số ngày để đảm bảo dữ liệu khớp 100%
+            
+            $this->tourModel->deleteOldItinerary($id); // Xóa lịch trình cũ
+            
+            $soNgay = (int)$_POST['so_ngay']; 
+            $titles = $_POST['itinerary_title'] ?? [];
+            $contents = $_POST['itinerary_content'] ?? [];
+
+            // Chỉ chạy vòng lặp đúng bằng số ngày ($soNgay)
+            for ($i = 0; $i < $soNgay; $i++) {
+                // Kiểm tra xem dữ liệu dòng đó có tồn tại không
+                if (isset($titles[$i])) {
+                    $day = $i + 1; // Ngày 1, 2, 3...
+                    $title = $titles[$i];
+                    $content = $contents[$i] ?? ''; 
+                    
+                    // Gọi hàm insert
+                    $this->tourModel->insertItinerary($id, $day, $title, $content);
                 }
             }
+            // ----------------------------------
 
+            // Xử lý Gallery ảnh
             if (isset($_FILES['gallery']['name'][0]) && !empty($_FILES['gallery']['name'][0])) {
                 $totalFiles = count($_FILES['gallery']['name']);
                 for ($i = 0; $i < $totalFiles; $i++) {
@@ -196,6 +213,7 @@ class TourController extends BaseController
                 }
             }
 
+            // Xử lý Nhà cung cấp
             $this->tourModel->deleteOldSuppliers($id);
             if (isset($_POST['suppliers'])) {
                 foreach ($_POST['suppliers'] as $nccId) {
@@ -231,24 +249,60 @@ class TourController extends BaseController
         header("Location: index.php?action=admin-tour-edit&id=$tourId#gallery");
     }
 
-    public function delete()
+   public function delete()
     {
         $id = $_GET['id'];
 
+        // --- BƯỚC KIỂM TRA AN TOÀN ---
+        // Gọi hàm vừa thêm ở Bước 1 để xem Tour có đang bận không
+        $isBusy = $this->lichModel->checkTourDangBan($id);
+
+        if ($isBusy) {
+            // Nếu Tour đang có khách/lịch chạy -> CHẶN NGAY
+            $errorMsg = "Không thể xóa Tour này vì đang có lịch khởi hành chưa kết thúc!";
+            header('Location: index.php?action=admin-tours&msg=error&content=' . urlencode($errorMsg));
+            return; 
+        }
+
+        // Nếu an toàn -> Gọi hàm xóa mềm ở Bước 3
+        // (Lưu ý: Đã xóa đoạn code unlink ảnh ở đây để giữ ảnh cho việc khôi phục)
+        $this->tourModel->delete($id);
+        header('Location: index.php?action=admin-tours&msg=deleted');
+    }
+
+    // 2. [MỚI] Các hàm xử lý Thùng rác
+    public function trash() {
+        $deletedTours = $this->tourModel->getDeleted();
+        $this->render('pages/admin/tours/trash', ['tours' => $deletedTours]);
+    }
+
+    public function restore() {
+        $id = $_GET['id'];
+        $this->tourModel->restore($id);
+        header('Location: index.php?action=admin-tour-trash&msg=restored');
+    }
+
+    public function destroy() {
+        $id = $_GET['id'];
+        // Logic xóa ảnh vật lý chỉ thực hiện khi xóa vĩnh viễn
         $tour = $this->tourModel->getDetail($id);
         if ($tour && !empty($tour['anh_tour'])) {
             $path = "assets/uploads/" . $tour['anh_tour'];
             if (file_exists($path)) unlink($path);
         }
+        // Xóa các ảnh gallery... (giữ nguyên logic cũ của bạn)
         $gallery = $this->tourModel->getGallery($id);
         foreach ($gallery as $img) {
             $path = "assets/uploads/" . $img['image_url'];
             if (file_exists($path)) unlink($path);
         }
 
-        $this->tourModel->delete($id);
-        header('Location: index.php?action=admin-tours&msg=deleted');
+        $this->tourModel->forceDelete($id);
+        header('Location: index.php?action=admin-tour-trash&msg=destroyed');
     }
+
+
+
 
     public function createLich()
     {

@@ -398,4 +398,26 @@ class LichKhoiHanhModel extends BaseModel
 
         return $result;
     }
+    
+    public function checkTourDangBan($tourId)
+    {
+        // Kiểm tra xem Tour này có dính lịch trình nào "chưa xong" không
+        // Điều kiện: 
+        // 1. Trạng thái là: Nhận khách, Đã đầy, Không nhận thêm, Đang đi
+        // 2. HOẶC Ngày kết thúc vẫn còn ở tương lai (chưa hoàn thành)
+        
+        $sql = "SELECT COUNT(*) as so_luong FROM lich_khoi_hanh 
+                WHERE tour_id = :tourId 
+                AND (
+                    trang_thai IN ('NhanKhach', 'DaDay', 'KhongNhanThemKhach', 'DangDi')
+                    OR ngay_ket_thuc >= NOW()
+                )";
+                
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute(['tourId' => $tourId]);
+        $result = $stmt->fetch();
+        
+        // Nếu số lượng > 0 nghĩa là ĐANG BẬN -> trả về true
+        return $result['so_luong'] > 0;
+    }
 }

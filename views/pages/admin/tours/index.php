@@ -11,24 +11,52 @@
         <h3 class="text-primary fw-bold">🏞️ Danh Sách Tours</h3>
         <div>
             <a href="<?= BASE_URL ?>routes/index.php?action=admin-dashboard" class="btn btn-secondary">
-                <i class="bi bi-speedometer2"></i> Về Dashboard
+                <i class="bi bi-speedometer2"></i> Dashboard
             </a>
+            
+            <a href="<?= BASE_URL ?>routes/index.php?action=admin-tour-trash" class="btn btn-warning">
+                <i class="bi bi-trash"></i> Thùng rác
+            </a>
+
             <a href="<?= BASE_URL ?>routes/index.php?action=admin-tour-create" class="btn btn-primary">
                 <i class="bi bi-plus-circle"></i> Thêm Tour Mới
             </a>
         </div>
     </div>
+
+
     <?php if(isset($_GET['msg'])): ?>
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            <?php 
-                $msg = $_GET['msg'];
-                if($msg == 'created') echo "Thêm tour mới thành công!";
-                elseif($msg == 'updated') echo "Cập nhật tour thành công!";
-                elseif($msg == 'deleted') echo "Đã xóa tour thành công!";
-            ?>
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
+        
+        <?php if($_GET['msg'] != 'error'): ?>
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="bi bi-check-circle-fill me-2"></i>
+                <?php 
+                    $msg = $_GET['msg'];
+                    if($msg == 'created') echo "Thêm tour mới thành công!";
+                    elseif($msg == 'updated') echo "Cập nhật tour thành công!";
+                    elseif($msg == 'deleted') echo "Đã chuyển tour vào thùng rác!";
+                    elseif($msg == 'restored') echo "Đã khôi phục tour thành công!";
+                ?>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        <?php endif; ?>
+
+        <?php if($_GET['msg'] == 'error'): ?>
+            <div class="alert alert-danger alert-dismissible fade show border-danger shadow-sm" role="alert">
+                <div class="d-flex align-items-center">
+                    <i class="bi bi-exclamation-triangle-fill fs-4 me-3"></i>
+                    <div>
+                        <strong>Không thể thực hiện!</strong> <br>
+                        <span class="small"><?= urldecode($_GET['content'] ?? 'Đã có lỗi xảy ra.') ?></span>
+                    </div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        <?php endif; ?>
+
     <?php endif; ?>
+
+    
 
     <div class="card shadow-sm">
         <div class="card-body p-0">
@@ -68,7 +96,7 @@
                                 <td class="text-center"><span class="badge bg-info text-dark"><?= $t['ten_loai'] ?></span></td>
                                 
                                 <td class="text-center">
-                                    <a href="<?= BASE_URL ?>routes/index.php?action=admin-tour-edit&id=<?= $t['id'] ?>" class="btn btn-sm btn-warning" title="Sửa">
+                                    <a href="<?= BASE_URL ?>routes/index.php?action=admin-tour-edit&id=<?= $t['id'] ?>" class="btn btn-sm btn-warning" title="Xem chi tiết & Sửa">
                                         <i class="bi bi-pencil-square"></i>
                                     </a>
                                     <a href="<?= BASE_URL ?>routes/index.php?action=admin-tour-delete&id=<?= $t['id'] ?>" class="btn btn-sm btn-danger" title="Xóa" onclick="return confirm('Bạn có chắc chắn muốn xóa tour này? Tất cả dữ liệu liên quan sẽ bị mất!')">

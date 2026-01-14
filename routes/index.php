@@ -11,7 +11,7 @@ match ($action) {
     'check-login'       => (new AuthController)->handleLogin(),
     'logout'            => (new AuthController)->logout(),
     
-    // Route cho Admin Dashboard
+    // Route  Admin 
     'admin-dashboard'   => (new DashboardController)->index(),
 
     // Route cho Hướng Dẫn Viên
@@ -25,7 +25,6 @@ match ($action) {
     'hdv-update-nhat-ky' => (new HdvController)->updateNhatKy(),
     'hdv-delete-nhat-ky' => (new HdvController)->deleteNhatKy(),
 
-    // --- [SỬA ĐỔI QUAN TRỌNG] Quản lý Lịch Khởi Hành ---
     // Chuyển quyền xử lý từ DashboardController sang TourController (nơi vừa thêm code logic)
     'admin-create-lich' => (new TourController)->createLich(),
     'admin-store-lich'  => (new TourController)->storeLich(),
@@ -45,7 +44,6 @@ match ($action) {
     'admin-booking-create' => (new BookingController)->create(),
     'admin-booking-store'  => (new BookingController)->store(),
     'admin-booking-detail' => (new BookingController)->detail(),
-
     // Routes Quản Lý Tour (Sản Phẩm)
     'admin-tours'       => (new TourController)->index(),
     'admin-tour-create' => (new TourController)->create(),
@@ -55,6 +53,10 @@ match ($action) {
     'admin-tour-delete' => (new TourController)->delete(),
     'admin-tour-delete-image' => (new TourController)->deleteGalleryImage(),
     'api-check-availability' => (new TourController)->checkAvailabilityApi(),
+    // Routes  Thùng rác
+    'admin-tour-trash'   => (new TourController)->trash(),   // Xem thùng rác
+    'admin-tour-restore' => (new TourController)->restore(), // Khôi phục tour
+    'admin-tour-destroy' => (new TourController)->destroy(), // Xóa vĩnh viễn
 
     // Routes Quản Lý HDV
     'admin-guides'       => (new GuideManagerController)->index(),
